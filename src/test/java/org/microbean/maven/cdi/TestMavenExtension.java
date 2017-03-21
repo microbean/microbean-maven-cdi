@@ -16,16 +16,46 @@
  */
 package org.microbean.maven.cdi;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 
 import javax.enterprise.event.Observes;
 
+import org.apache.maven.settings.Settings;
+
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+
+import org.eclipse.aether.collection.CollectRequest;
+
+import org.eclipse.aether.graph.Dependency;
+
+import org.eclipse.aether.repository.RemoteRepository;
+
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResult;
+
+import org.eclipse.aether.util.artifact.JavaScopes;
+
+import org.eclipse.aether.util.filter.DependencyFilterUtils;
+
 import org.junit.Test;
+
+import org.eclipse.aether.transfer.TransferListener;
 
 import org.microbean.main.Main;
 
+import org.microbean.maven.cdi.annotation.Resolution;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @ApplicationScoped
 public class TestMavenExtension {
@@ -58,8 +88,27 @@ public class TestMavenExtension {
    * Instance methods.
    */
 
-  private final void onStartup(@Observes @Initialized(ApplicationScoped.class) final Object event) {
+  private final void onStartup(@Observes @Initialized(ApplicationScoped.class) final Object event,
+                               final RepositorySystem repositorySystem,
+                               final RepositorySystemSession session,
+                               @Resolution final List<RemoteRepository> remoteRepositories,
+                               final TransferListener transferListener)
+    throws DependencyResolutionException {
+    assertNotNull(repositorySystem);
+    assertNotNull(session);
+    assertNotNull(remoteRepositories);
+    assertNotNull(session.getDependencyManager());
+    assertNotNull(transferListener);
+    final CollectRequest collectRequest = new CollectRequest();
+    final Artifact artifact = new DefaultArtifact("org.microbean", "microbean-configuration-cdi", "jar", "0.1.0");
+    collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
+    collectRequest.setRepositories(remoteRepositories);
 
+    final DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE));
+    final DependencyResult dependencyResult = repositorySystem.resolveDependencies(session, dependencyRequest);
+    assertNotNull(dependencyResult);
+    final List<ArtifactResult> artifactResults = dependencyResult.getArtifactResults();
+    assertNotNull(artifactResults);
   }
   
   @Test
