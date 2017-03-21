@@ -17,7 +17,9 @@
 package org.microbean.maven.cdi;
 
 import java.io.File;
+import java.io.Serializable; // for javadoc only
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -330,6 +332,22 @@ public class MavenExtension implements Extension {
     }
   }
 
+  /**
+   * Inspects all types with {@link Requirement} annotations and adds
+   * {@link Inject} and {@link Hinted} annotations on each {@link
+   * Requirement}-annotated field found.
+   *
+   * <p>This has the net effect of turning a Plexus injection point
+   * into a CDI injection point.</p>
+   *
+   * @param <X> the type being processed
+   *
+   * @param event the {@link ProcessAnnotatedType} event describing
+   * the type to process; may be {@code null} in which case no action
+   * will be taken
+   *
+   * @see Requirement
+   */
   private final <X> void processPlexusRequirementAnnotatedMembers(@Observes @WithAnnotations(Requirement.class) final ProcessAnnotatedType<X> event) {
     if (event != null) {
       final AnnotatedType<X> type = event.getAnnotatedType();
@@ -355,6 +373,20 @@ public class MavenExtension implements Extension {
     }
   }
 
+  /**
+   * Inspects all types annotated with {@link Component} to see if
+   * they have a designated {@linkplain Component#role() role}, and,
+   * if so, adds an appropriate {@link Typed} annotation to them as
+   * well as a {@link Hinted} annotation, if necessary.
+   *
+   * @param <X> the type being processed
+   *
+   * @param event the {@link ProcessAnnotatedType} event describing
+   * the type to process; may be {@code null} in which case no action
+   * will be taken
+   *
+   * @see Component
+   */
   private final <X> void processPlexusComponentAnnotatedTypes(@Observes @WithAnnotations(Component.class) final ProcessAnnotatedType<X> event) {
     if (event != null) {
       final AnnotatedType<X> type = event.getAnnotatedType();
@@ -620,7 +652,8 @@ public class MavenExtension implements Extension {
      * <p>This method is only necessary until <a
      * href="https://issues.apache.org/jira/browse/MNG-6190">MNG-6190</a>
      * is fixed and can then be removed in favor of a simple {@link
-     * ProcessAnnotatedType#addAnnotatedType(Class)} invocation.</p>
+     * BeforeBeanDiscovery#addAnnotatedType(Class, String)}
+     * invocation.</p>
      *
      * @param remoteRepositoryManager the {@link
      * RemoteRepositoryManager} to build the {@link
@@ -685,20 +718,20 @@ public class MavenExtension implements Extension {
 
 
     @Produces
-    @Dependent
+    @Singleton
     private static final Set<LocalRepositoryManagerFactory> produceLocalRepositoryManagerFactorySet(@Any final Instance<LocalRepositoryManagerFactory> localRepositoryManagerFactories) {
       final Set<LocalRepositoryManagerFactory> returnValue = produceSet(localRepositoryManagerFactories);
       return returnValue;
     }
 
     @Produces
-    @Dependent
+    @Singleton
     private static final Set<RepositoryLayoutFactory> produceRepositoryLayoutFactorySet(@Any final Instance<RepositoryLayoutFactory> repositoryLayoutFactories) {
       return produceSet(repositoryLayoutFactories);
     }
 
     @Produces
-    @Dependent
+    @Singleton
     private static final Set<TransporterFactory> produceTransporterFactorySet(@Any final Instance<TransporterFactory> transporterFactories) {
       return produceSet(transporterFactories);
     }
@@ -710,13 +743,13 @@ public class MavenExtension implements Extension {
     }
 
     @Produces
-    @Dependent
+    @Singleton
     private static final Set<RepositoryConnectorFactory> produceRepositoryConnectorFactorySet(@Any final Instance<RepositoryConnectorFactory> repositoryConnectorFactories) {
       return produceSet(repositoryConnectorFactories);
     }
 
     @Produces
-    @Dependent
+    @Singleton
     private static final Set<MetadataGeneratorFactory> produceMetadataGeneratorFactorySet(@Any final Instance<MetadataGeneratorFactory> metadataGeneratorFactories) {
       return produceSet(metadataGeneratorFactories);
     }
@@ -775,6 +808,7 @@ public class MavenExtension implements Extension {
    *
    * @see Requirement
    */
+  @Documented
   @Qualifier
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE })
@@ -788,6 +822,8 @@ public class MavenExtension implements Extension {
     
     /**
      * The value of the hint.
+     *
+     * @return the value of the hint
      */
     String value() default "";
 
@@ -830,8 +866,6 @@ public class MavenExtension implements Extension {
        * The hint being represented.
        *
        * <p>This field is never {@code null}.</p>
-       *
-       * @see #Literal(String)
        */
       private final String value;
 
