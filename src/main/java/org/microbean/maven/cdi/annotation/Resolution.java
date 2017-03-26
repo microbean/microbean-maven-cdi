@@ -24,6 +24,25 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
+import org.eclipse.aether.RepositorySystem; // for javadoc only
+import org.eclipse.aether.RepositorySystemSession; // for javadoc only
+
+import org.eclipse.aether.deployment.DeployRequest; // for javadoc only
+
+import org.eclipse.aether.resolution.DependencyRequest; // for javadoc only
+
+/**
+ * A {@link Qualifier} annotation that indicates that whatever it
+ * annotates is affiliated somehow with {@linkplain
+ * RepositorySystem#resolveDependencies(RepositorySystemSession,
+ * DependencyRequest) artifact or dependency <em>resolution</em>}, as
+ * opposed to, say, {@linkplain
+ * RepositorySystem#deploy(RepositorySystemSession, DeployRequest)
+ * artifact <em>deployment</em>}.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 @Documented
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)

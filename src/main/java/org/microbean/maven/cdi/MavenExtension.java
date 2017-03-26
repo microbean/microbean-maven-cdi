@@ -110,6 +110,7 @@ import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
 import org.apache.maven.repository.internal.DefaultVersionRangeResolver;
 import org.apache.maven.repository.internal.DefaultVersionResolver;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils; // for javadoc only
 import org.apache.maven.repository.internal.SnapshotMetadataGeneratorFactory;
 import org.apache.maven.repository.internal.VersionsMetadataGeneratorFactory;
 
@@ -230,12 +231,52 @@ import org.microbean.maven.cdi.annotation.Resolution;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A <a
+ * href="http://docs.jboss.org/cdi/spec/2.0-PRD/cdi-spec.html#spi">CDI
+ * 2.0 portable extension</a> that exposes the <a
+ * href="https://maven.apache.org/resolver/">Maven Artifact Resolver
+ * components</a> as CDI beans, particularly for the purposes of
+ * dependency resolution.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see RepositorySystem
+ *
+ * @see RepositorySystemSession
+ */
 public class MavenExtension implements Extension {
 
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link MavenExtension}.
+   */
   public MavenExtension() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * Registers certain Maven Resolver components as CDI beans in
+   * appropriate scopes.
+   *
+   * @param event the {@link BeforeBeanDiscovery} event indicating
+   * that bean discovery has started; may be {@code null} in which
+   * case no action will be taken
+   *
+   * @see BeforeBeanDiscovery#addAnnotatedType(Class, String)
+   */
   private final void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery event) {
     if (event != null) {
 
@@ -415,8 +456,37 @@ public class MavenExtension implements Extension {
    */
   
 
+  /**
+   * A class housing several <a
+   * href="http://docs.jboss.org/cdi/spec/2.0-PRD/cdi-spec.html#producer_method">producer
+   * methods</a> that produce certain <a
+   * href="https://maven.apache.org/resolver/">Maven Artifact Resolver
+   * components</a>.
+   *
+   * @author <a href="http://about.me/lairdnelson"
+   * target="_parent">Laird Nelson</a>
+   */
   private static final class Producers {
 
+
+    /*
+     * Static methods.
+     */
+
+
+    /**
+     * Produces a {@link MirrorSelector} in {@link Singleton} scope
+     * from the contents of a {@link Settings} object.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param settings the {@link Settings} object containing the raw
+     * materials necessary for the production of a {@link
+     * MirrorSelector}; may be {@code null} in which case a new {@link
+     * MirrorSelector} will be returned
+     *
+     * @return a {@link MirrorSelector}; never {@code null}
+     */
     @Produces
     @Singleton
     private static final MirrorSelector produceMirrorSelector(final Settings settings) {
@@ -437,7 +507,28 @@ public class MavenExtension implements Extension {
       }
       return mirrorSelector;
     }
-    
+
+    /**
+     * Produces a {@link Settings} object in {@link Singleton} scope
+     * from the supplied {@link SettingsBuilder} object.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param settingsBuilder the {@link SettingsBuilder} that will
+     * ultimately be used to create this method's return value; must
+     * not be {@code null}
+     *
+     * @return a {@link Settings} object; never {@code null}
+     *
+     * @exception NullPointerException if {@code settingsBuilder} is
+     * {@code null}
+     *
+     * @exception SettingsBuildingException if the {@link
+     * SettingsBuildingResult#getProblems()} method invoked on the
+     * return value of the {@link
+     * SettingsBuilder#build(SettingsBuildingRequest)} method returns
+     * a {@link List} of {@link SettingsProblem}s
+     */
     @Produces
     @Singleton
     private static final Settings produceSettings(final SettingsBuilder settingsBuilder) throws SettingsBuildingException {
@@ -469,7 +560,41 @@ public class MavenExtension implements Extension {
       final Settings returnValue = settingsBuildingResult.getEffectiveSettings();
       return returnValue;
     }
-    
+
+    /**
+     * Produces a {@link ProfileSelector} in {@link Singleton} scope
+     * that makes use of the supplied {@link ProfileActivator}s.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param jdkVersionProfileActivator a {@link ProfileActivator}
+     * that can activate a Maven profile based on the version of the
+     * JDK; may be {@code null}
+     *
+     * @param operatingSystemProfileActivator a {@link
+     * ProfileActivator} that can activate a Maven profile based on
+     * the current operating system; may be {@code null}
+     *
+     * @param fileProfileActivator a {@link ProfileActivator} that can
+     * activate a Maven profile based on the presence of a file; may
+     * be {@code null}
+     *
+     * @param propertyProfileActivator a {@link ProfileActivator} that
+     * can activate a maven profile based on the value of a property;
+     * may be {@code null}
+     *
+     * @return a {@link ProfileSelector}; never {@code null}
+     *
+     * @see JdkVersionProfileActivator
+     *
+     * @see OperatingSystemProfileActivator
+     *
+     * @see FileProfileActivator
+     *
+     * @see PropertyProfileActivator
+     *
+     * @see DefaultProfileSelector
+     */
     @Produces
     @Singleton
     private static final ProfileSelector produceProfileSelector(@Hinted("jdk-version") final ProfileActivator jdkVersionProfileActivator,
@@ -484,17 +609,44 @@ public class MavenExtension implements Extension {
       return returnValue;
     }
 
+    /**
+     * Produces an {@link ILoggerFactory} in {@link Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @return an {@link ILoggerFactory}; never {@code null}
+     *
+     * @see LoggerFactory#getILoggerFactory()
+     */
     @Produces
     @Singleton
     private static final ILoggerFactory produceILoggerFactory() {
       return LoggerFactory.getILoggerFactory();
     }
 
+    /**
+     * Produces a {@link LocalRepository} in {@link Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param settings the {@link Settings} object whose {@link
+     * Settings#getLocalRepository()} method might return the location
+     * of the local repository; may be {@code null} in which case a
+     * {@link LocalRepository} representing the location formed by the
+     * concatenation of the value of the {@code user.home} System
+     * property and the {@link String} {@code /.m2/repository}
+     *
+     * @return a {@link LocalRepository}; never {@code null}
+     *
+     * @see Settings#getLocalRepository()
+     */
     @Produces
     @Singleton
     private static final LocalRepository produceLocalRepository(final Settings settings) {
-      Objects.requireNonNull(settings);
-      String localRepositoryString = settings.getLocalRepository();
+      String localRepositoryString = null;
+      if (settings == null) {
+        localRepositoryString = settings.getLocalRepository();
+      }
       if (localRepositoryString == null) {
         localRepositoryString = System.getProperty("user.home") + "/.m2/repository";
       }
@@ -502,43 +654,73 @@ public class MavenExtension implements Extension {
       return returnValue;
     }
 
+    /**
+     * Produces a {@link List} of {@link RemoteRepository} instances
+     * in {@link Dependent} scope {@linkplain Resolution suitable for
+     * artifact resolution} whose contents are inferred from reading
+     * the {@linkplain Settings#getActiveProfiles() active profiles
+     * contained in the supplied <code>Settings</code> object}.
+     *
+     * <p>This method will never return {@code null}.</p>
+     *
+     * @param settings the {@link Settings} object whose {@linkplain
+     * Settings#getActiveProfiles() active profiles} will be read for
+     * repository locations; may be {@code null}
+     *
+     * @param repositorySystem the {@link RepositorySystem} whose
+     * {@link
+     * RepositorySystem#newResolutionRepositories(RepositorySystemSession,
+     * List)} method will be called; must not be {@code null}
+     *
+     * @param session the {@link RepositorySystemSession} currently in
+     * effect; must not be {@code null}
+     *
+     * @return a {@link List} of {@link RemoteRepository} instances
+     * {@link Resolution suitable for artifact resolution}; never
+     * {@code null}
+     *
+     * @exception NullPointerException if either {@code
+     * repositorySystem} or {@code session} is {@code null}
+     */
     @Produces
     @Dependent
     @Resolution
     private static final List<RemoteRepository> produceRemoteRepositoryList(final Settings settings,
                                                                             final RepositorySystem repositorySystem,
                                                                             final RepositorySystemSession session) {
-      Objects.requireNonNull(settings);
       Objects.requireNonNull(repositorySystem);
+      Objects.requireNonNull(session);
       List<RemoteRepository> remoteRepositories = new ArrayList<>();
-      final Map<String, Profile> profiles = settings.getProfilesAsMap();
-      if (profiles != null && !profiles.isEmpty()) {
-        final Collection<String> activeProfileKeys = settings.getActiveProfiles();
-        if (activeProfileKeys != null && !activeProfileKeys.isEmpty()) {
-          for (final String activeProfileKey : activeProfileKeys) {
-            final Profile activeProfile = profiles.get(activeProfileKey);
-            if (activeProfile != null) {
-              final Collection<Repository> repositories = activeProfile.getRepositories();
-              if (repositories != null && !repositories.isEmpty()) {
-                for (final Repository repository : repositories) {
-                  if (repository != null) {
-                    RemoteRepository.Builder builder = new RemoteRepository.Builder(repository.getId(), repository.getLayout(), repository.getUrl());
-                    
-                    final org.apache.maven.settings.RepositoryPolicy settingsReleasePolicy = repository.getReleases();
-                    if (settingsReleasePolicy != null) {
-                      final org.eclipse.aether.repository.RepositoryPolicy releasePolicy = new org.eclipse.aether.repository.RepositoryPolicy(settingsReleasePolicy.isEnabled(), settingsReleasePolicy.getUpdatePolicy(), settingsReleasePolicy.getChecksumPolicy());
-                      builder = builder.setReleasePolicy(releasePolicy);
+      if (settings != null) {
+        final Map<String, Profile> profiles = settings.getProfilesAsMap();
+        if (profiles != null && !profiles.isEmpty()) {
+          final Collection<String> activeProfileKeys = settings.getActiveProfiles();
+          if (activeProfileKeys != null && !activeProfileKeys.isEmpty()) {
+            for (final String activeProfileKey : activeProfileKeys) {
+              final Profile activeProfile = profiles.get(activeProfileKey);
+              if (activeProfile != null) {
+                final Collection<Repository> repositories = activeProfile.getRepositories();
+                if (repositories != null && !repositories.isEmpty()) {
+                  for (final Repository repository : repositories) {
+                    if (repository != null) {
+                      RemoteRepository.Builder builder = new RemoteRepository.Builder(repository.getId(), repository.getLayout(), repository.getUrl());
+                      
+                      final org.apache.maven.settings.RepositoryPolicy settingsReleasePolicy = repository.getReleases();
+                      if (settingsReleasePolicy != null) {
+                        final org.eclipse.aether.repository.RepositoryPolicy releasePolicy = new org.eclipse.aether.repository.RepositoryPolicy(settingsReleasePolicy.isEnabled(), settingsReleasePolicy.getUpdatePolicy(), settingsReleasePolicy.getChecksumPolicy());
+                        builder = builder.setReleasePolicy(releasePolicy);
+                      }
+                      
+                      final org.apache.maven.settings.RepositoryPolicy settingsSnapshotPolicy = repository.getSnapshots();
+                      if (settingsSnapshotPolicy != null) {
+                        final org.eclipse.aether.repository.RepositoryPolicy snapshotPolicy = new org.eclipse.aether.repository.RepositoryPolicy(settingsSnapshotPolicy.isEnabled(), settingsSnapshotPolicy.getUpdatePolicy(), settingsSnapshotPolicy.getChecksumPolicy());
+                        builder = builder.setSnapshotPolicy(snapshotPolicy);
+                      }
+                      
+                      final RemoteRepository remoteRepository = builder.build();
+                      assert remoteRepository != null;
+                      remoteRepositories.add(remoteRepository);
                     }
-                    
-                    final org.apache.maven.settings.RepositoryPolicy settingsSnapshotPolicy = repository.getSnapshots();
-                    if (settingsSnapshotPolicy != null) {
-                      final org.eclipse.aether.repository.RepositoryPolicy snapshotPolicy = new org.eclipse.aether.repository.RepositoryPolicy(settingsSnapshotPolicy.isEnabled(), settingsSnapshotPolicy.getUpdatePolicy(), settingsSnapshotPolicy.getChecksumPolicy());
-                      builder = builder.setSnapshotPolicy(snapshotPolicy);
-                    }
-                    
-                    final RemoteRepository remoteRepository = builder.build();
-                    assert remoteRepository != null;
-                    remoteRepositories.add(remoteRepository);
                   }
                 }
               }
@@ -554,6 +736,118 @@ public class MavenExtension implements Extension {
       return remoteRepositories;
     }
 
+    /**
+     * Produces a {@link RepositorySystemSession} in {@link Dependent} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * <h2>Implementation Notes</h2>
+     *
+     * <p>This method returns an {@link RepositorySystemSession} that
+     * is built in the same manner as that built by the {@link
+     * MavenRepositorySystemUtils#newSession()} method.</p>
+     *
+     * @param dependencyTraverser the {@link DependencyTraverser} that
+     * helps in pruning the dependency graph; may be {@code null}
+     *
+     * @param dependencyManager the {@link DependencyManager} that
+     * applies any overriding concerns with respect to particular
+     * dependencies' versions and scopes (think {@code
+     * <dependencyManagement>} in a Maven {@code pom.xml} file); may
+     * be {@code null}
+     *
+     * @param dependencySelector a {@link DependencySelector} that
+     * helps filter dependencies; may be {@code null}
+     *
+     * @param dependencyGraphTransformer a {@link
+     * DependencyGraphTransformer} that helps with conflict
+     * resolution; may be {@code null}
+     *
+     * @param artifactTypeRegistry an {@link ArtifactTypeRegistry}
+     * that governs what artifacts will be looked at; may be {@code
+     * null}
+     *
+     * @param artifactDescriptorPolicy an {@link
+     * ArtifactDescriptorPolicy} that controls what to do with missing
+     * or invalid artifacts; may be {@code null}
+     *
+     * @param settings a {@link Settings} object whose {@link
+     * Settings#isOffline()} method will be consulted; may be {@code
+     * null}
+     *
+     * @param mirrorSelector a {@link MirrorSelector} that will choose
+     * the appropriate mirror for a given repository; may be {@code
+     * null}
+     *
+     * @param localRepository a {@link LocalRepository} instance
+     * representing the location where remote artifacts will be
+     * cached; must not be {@code null}
+     *
+     * @param localRepositoryProvider a {@link
+     * LocalRepositoryProvider} that will be {@linkplain
+     * LocalRepositoryProvider#newLocalRepositoryManager(RepositorySystemSession,
+     * LocalRepository) used to obtain a
+     * <code>LocalRepositoryManager</code>}; must not be {@code null}
+     *
+     * @param transferListenerInstance an {@link Instance}
+     * representing a {@link TransferListener}, which, {@linkplain
+     * Instance#isResolvable() if resolvable}, will be installed on
+     * the returned {@link RepositorySystemSession}; may be {@code
+     * null}
+     *
+     * @return a {@link RepositorySystemSession}; never {@code null}
+     *
+     * @exception NullPointerException if any parameter described
+     * above that must be non-{@code null} was {@code null}
+     *
+     * @exception NoLocalRepositoryManagerException if the supplied
+     * {@link LocalRepositoryProvider} could not {@linkplain
+     * LocalRepositoryProvider#newLocalRepositoryManager(RepositorySystemSession,
+     * LocalRepository) provide a <code>LocalRepositoryManager</code>}
+     *
+     * @see MavenRepositorySystemUtils#newSession()
+     *
+     * @see FatArtifactTraverser
+     *
+     * @see ClassicDependencyManager
+     *
+     * @see ScopeDependencySelector
+     *
+     * @see OptionalDependencySelector
+     *
+     * @see ExclusionDependencySelector
+     *
+     * @see ConflictResolver
+     *
+     * @see NearestVersionSelector
+     *
+     * @see JavaScopeSelector
+     *
+     * @see SimpleOptionalitySelector
+     *
+     * @see JavaScopeDeriver
+     *
+     * @see #produceArtifactTypeRegistry()
+     *
+     * @see #produceArtifactDescriptorPolicy()
+     *
+     * @see Settings#isOffline()
+     *
+     * @see DefaultRepositorySystemSession#setOffline(boolean)
+     *
+     * @see #produceMirrorSelector(Settings)
+     *
+     * @see #produceLocalRepository(Settings)
+     *
+     * @see
+     * LocalRepositoryProvider#newLocalRepositoryManager(RepositorySystemSession,
+     * LocalRepository)
+     *
+     * @see TransferListener
+     *
+     * @see
+     * DefaultRepositorySystemSession#setTransferListener(TransferListener)
+     */
     @Produces
     @Dependent
     private static final RepositorySystemSession produceRepositorySystemSession(final DependencyTraverser dependencyTraverser,
@@ -600,6 +894,22 @@ public class MavenExtension implements Extension {
       return session;
     }
 
+    /**
+     * Produces a {@link DependencySelector} in {@link Singleton}
+     * scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * <h2>Implementation Notes</h2>
+     *
+     * <p>This method returns an {@link AndDependencySelector} that is
+     * built in the same manner as that built by the {@link
+     * MavenRepositorySystemUtils#newSession()} method.</p>
+     *
+     * @return a {@link DependencySelector}; never {@code null}
+     *
+     * @see MavenRepositorySystemUtils#newSession()
+     */
     @Produces
     @Singleton
     private static final DependencySelector produceDependencySelector() {
@@ -608,6 +918,24 @@ public class MavenExtension implements Extension {
                                        new ExclusionDependencySelector());
     }
 
+    /**
+     * Produces a {@link DependencyGraphTransformer} in {@link
+     * Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * <h2>Implementation Notes</h2>
+     *
+     * <p>This method returns a {@link
+     * ChainedDependencyGraphTransformer} that is built in the same
+     * manner as that built by the {@link
+     * MavenRepositorySystemUtils#newSession()} method.</p>
+     *
+     * @return a {@link DependencyGraphTransformer}; never {@code
+     * null}
+     *
+     * @see MavenRepositorySystemUtils#newSession()
+     */
     @Produces
     @Singleton
     private static final DependencyGraphTransformer produceDependencyGraphTransformer() {
@@ -618,6 +946,22 @@ public class MavenExtension implements Extension {
                                                    new JavaDependencyContextRefiner());
     }
 
+    /**
+     * Produces an {@link ArtifactTypeRegistry} in {@link Singleton}
+     * scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * <h2>Implementation Notes</h2>
+     *
+     * <p>This method returns a {@link DefaultArtifactTypeRegistry}
+     * that is built in the same manner as that built by the {@link
+     * MavenRepositorySystemUtils#newSession()} method.</p>
+     *
+     * @return an {@link ArtifactTypeRegistry}; never {@code null}
+     *
+     * @see MavenRepositorySystemUtils#newSession()
+     */
     @Produces
     @Singleton
     private static final ArtifactTypeRegistry produceArtifactTypeRegistry() {
@@ -637,6 +981,22 @@ public class MavenExtension implements Extension {
       return stereotypes;
     }
 
+    /**
+     * Produces an {@link ArtifactDescriptorPolicy} in {@link
+     * Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * <h2>Implementation Notes</h2>
+     *
+     * <p>This method returns a {@link SimpleArtifactDescriptorPolicy}
+     * that is built in the same manner as that built by the {@link
+     * MavenRepositorySystemUtils#newSession()} method.</p>
+     *
+     * @return an {@link ArtifactDescriptorPolicy}; never {@code null}
+     *
+     * @see MavenRepositorySystemUtils#newSession()
+     */
     @Produces
     @Singleton
     private static final ArtifactDescriptorPolicy produceArtifactDescriptorPolicy() {
@@ -717,6 +1077,22 @@ public class MavenExtension implements Extension {
      */
 
 
+    /**
+     * Converts an {@link Instance} of {@link
+     * LocalRepositoryManagerFactory} instances into a {@link Set} of
+     * such instances in {@link Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param localRepositoryManagerFactories an {@link Instance} of
+     * {@link LocalRepositoryManagerFactory} instances; may be {@code
+     * null}
+     *
+     * @return a {@link Set} of {@link LocalRepositoryManagerFactory}
+     * instances; never {@code null}
+     *
+     * @see #produceSet(Instance)
+     */
     @Produces
     @Singleton
     private static final Set<LocalRepositoryManagerFactory> produceLocalRepositoryManagerFactorySet(@Any final Instance<LocalRepositoryManagerFactory> localRepositoryManagerFactories) {
@@ -724,36 +1100,126 @@ public class MavenExtension implements Extension {
       return returnValue;
     }
 
+    /**
+     * Converts an {@link Instance} of {@link RepositoryLayoutFactory}
+     * instances into a {@link Set} of such instances in {@link
+     * Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param repositoryLayoutFactories an {@link Instance} of {@link
+     * RepositoryLayoutFactory} instances; may be {@code null}
+     *
+     * @return a {@link Set} of {@link RepositoryLayoutFactory}
+     * instances; never {@code null}
+     *
+     * @see #produceSet(Instance)
+     */
     @Produces
     @Singleton
     private static final Set<RepositoryLayoutFactory> produceRepositoryLayoutFactorySet(@Any final Instance<RepositoryLayoutFactory> repositoryLayoutFactories) {
       return produceSet(repositoryLayoutFactories);
     }
 
+    /**
+     * Converts an {@link Instance} of {@link TransporterFactory}
+     * instances into a {@link Set} of such instances in {@link
+     * Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param transporterFactories an {@link Instance} of {@link
+     * TransporterFactory} instances; may be {@code null}
+     *
+     * @return a {@link Set} of {@link TransporterFactory} instances;
+     * never {@code null}
+     *
+     * @see #produceSet(Instance)
+     */
     @Produces
     @Singleton
     private static final Set<TransporterFactory> produceTransporterFactorySet(@Any final Instance<TransporterFactory> transporterFactories) {
       return produceSet(transporterFactories);
     }
-    
+
+    /**
+     * Converts an {@link Instance} of {@link RepositoryListener}
+     * instances into a {@link Set} of such instances in {@link
+     * Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param repositoryListeners an {@link Instance} of {@link
+     * RepositoryListener} instances; may be {@code null}
+     *
+     * @return a {@link Set} of {@link RepositoryListener} instances;
+     * never {@code null}
+     *
+     * @see #produceSet(Instance)
+     */
     @Produces
     @Dependent
     private static final Set<RepositoryListener> produceRepositoryListenerSet(@Any final Instance<RepositoryListener> repositoryListeners) {
       return produceSet(repositoryListeners);
     }
 
+    /**
+     * Converts an {@link Instance} of {@link
+     * RepositoryConnectorFactory} instances into a {@link Set} of
+     * such instances in {@link Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param repositoryConnectorFactories an {@link Instance} of
+     * {@link RepositoryConnectorFactory} instances; may be {@code
+     * null}
+     *
+     * @return a {@link Set} of {@link RepositoryConnectorFactory}
+     * instances; never {@code null}
+     *
+     * @see #produceSet(Instance)
+     */
     @Produces
     @Singleton
     private static final Set<RepositoryConnectorFactory> produceRepositoryConnectorFactorySet(@Any final Instance<RepositoryConnectorFactory> repositoryConnectorFactories) {
       return produceSet(repositoryConnectorFactories);
     }
-
+    
+    /**
+     * Converts an {@link Instance} of {@link
+     * MetadataGeneratorFactory} instances into a {@link Set} of such
+     * instances in {@link Singleton} scope.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param metadataGeneratorFactories an {@link Instance} of {@link
+     * MetadataGeneratorFactory} instances; may be {@code null}
+     *
+     * @return a {@link Set} of {@link MetadataGeneratorFactory}
+     * instances; never {@code null}
+     *
+     * @see #produceSet(Instance)
+     */
     @Produces
     @Singleton
     private static final Set<MetadataGeneratorFactory> produceMetadataGeneratorFactorySet(@Any final Instance<MetadataGeneratorFactory> metadataGeneratorFactories) {
       return produceSet(metadataGeneratorFactories);
     }
 
+    /**
+     * Returns a {@link Set} of the objects represented by the
+     * supplied {@link Instance}.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @param <T> the type of object the returned {@link Set} will
+     * contain
+     *
+     * @param things the {@link Instance} whose instances should be
+     * returned as a {@link Set}; may be {@code null}
+     *
+     * @return a non-{@code null} {@link Set}
+     */
     private static final <T> Set<T> produceSet(final Instance<? extends T> things) {
       final Set<T> returnValue = new HashSet<>();
       if (things != null) {
