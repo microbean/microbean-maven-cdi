@@ -7,7 +7,7 @@
   </prerequisites>
 
   <artifactId>microbean-maven-cdi</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
 
   <parent>
     <groupId>org.microbean</groupId>
@@ -18,7 +18,7 @@
   <name>MicroBean Maven CDI</name>
   <description>${project.name}</description>
   <url>http://ljnelson.github.io/${project.artifactId}</url>  
-  
+
   <scm>
     <connection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</developerConnection>
@@ -39,7 +39,7 @@
       <dependency>
         <groupId>javax.enterprise</groupId>
         <artifactId>cdi-api</artifactId>
-        <version>2.0-PFD</version>
+        <version>2.0-PFD2</version>
         <type>jar</type>
       </dependency>
 
@@ -131,21 +131,21 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-main</artifactId>
-        <version>4</version>
+        <version>5</version>
         <type>jar</type>
       </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.24</version>
+      <version>1.7.25</version>
       <type>jar</type>
     </dependency>
       
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>1.7.24</version>
+      <version>1.7.25</version>
       <type>jar</type>
     </dependency>
       
@@ -380,7 +380,7 @@
     <findbugs.threshold>Medium</findbugs.threshold>
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <links>https://www.slf4j.org/api/,http://docs.jboss.org/cdi/api/2.0-PFD/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.3.9/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/</links>
+    <links>https://www.slf4j.org/api/,http://docs.jboss.org/cdi/api/2.0-PFD2/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.3.9/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/</links>
 
     <!-- maven-release-plugin properties -->
     <goals>deploy,site-deploy</goals>
