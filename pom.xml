@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.microbean</groupId>
     <artifactId>microbean-pluginmanagement-pom</artifactId>
-    <version>1</version>
+    <version>3</version>
   </parent>
 
   <name>MicroBean Maven CDI</name>
@@ -53,21 +53,21 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
-        <version>3.5.0-alpha-1</version>
+        <version>3.5.0-beta-1</version>
         <type>jar</type>
       </dependency>
       
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
-        <version>3.5.0-alpha-1</version>
+        <version>3.5.0-beta-1</version>
         <type>jar</type>
       </dependency>
       
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings-builder</artifactId>
-        <version>3.5.0-alpha-1</version>
+        <version>3.5.0-beta-1</version>
         <type>jar</type>
       </dependency>
 
@@ -88,7 +88,7 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-resolver-provider</artifactId>
-        <version>3.5.0-alpha-1</version>
+        <version>3.5.0-beta-1</version>
         <type>jar</type>
       </dependency>
 
@@ -131,7 +131,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-main</artifactId>
-        <version>5</version>
+        <version>6</version>
         <type>jar</type>
       </dependency>
 
@@ -352,21 +352,6 @@
       <plugin>
         <groupId>com.github.github</groupId>
         <artifactId>site-maven-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.eclipse.mylyn.github</groupId>
-            <artifactId>org.eclipse.egit.github.core</artifactId>
-            <version>2.1.5</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <goals>
-              <goal>site</goal>
-            </goals>
-            <phase>site-deploy</phase>
-          </execution>
-        </executions>
       </plugin>
 
     </plugins>

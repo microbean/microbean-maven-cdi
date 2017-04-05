@@ -547,7 +547,13 @@ public class MavenExtension implements Extension {
       }
       request.setSystemProperties(requestSystemProperties);
       // request.setUserProperties(userProperties); // TODO: implement this
-      // request.setGlobalSettingsFile(new File("/usr/local/maven/conf/settings.xml")); // TODO: do this for real
+      String m2Home = System.getProperty("maven.home");
+      if (m2Home == null) {
+        m2Home = System.getenv("M2_HOME");
+      }
+      if (m2Home != null) {
+        request.setGlobalSettingsFile(new File(new File(m2Home), "conf/settings.xml"));
+      }
       request.setUserSettingsFile(new File(new File(System.getProperty("user.home")), ".m2/settings.xml")); // TODO: from configuration, too
       final SettingsBuildingResult settingsBuildingResult = settingsBuilder.build(request);
       assert settingsBuildingResult != null;
