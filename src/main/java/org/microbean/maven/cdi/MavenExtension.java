@@ -650,7 +650,7 @@ public class MavenExtension implements Extension {
     @Singleton
     private static final LocalRepository produceLocalRepository(final Settings settings) {
       String localRepositoryString = null;
-      if (settings == null) {
+      if (settings != null) {
         localRepositoryString = settings.getLocalRepository();
       }
       if (localRepositoryString == null) {
