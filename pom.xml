@@ -7,7 +7,7 @@
   </prerequisites>
 
   <artifactId>microbean-maven-cdi</artifactId>
-  <version>0.1.3</version>
+  <version>0.1.4-SNAPSHOT</version>
 
   <parent>
     <groupId>org.microbean</groupId>
@@ -23,7 +23,7 @@
     <connection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</developerConnection>
     <url>https://github.com/ljnelson/${project.artifactId}/</url>
-    <tag>microbean-maven-cdi-0.1.3</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencyManagement>
