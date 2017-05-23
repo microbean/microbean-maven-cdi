@@ -39,7 +39,7 @@
       <dependency>
         <groupId>javax.enterprise</groupId>
         <artifactId>cdi-api</artifactId>
-        <version>2.0-PFD2</version>
+        <version>2.0</version>
         <type>jar</type>
       </dependency>
 
@@ -53,21 +53,21 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
-        <version>3.5.0-beta-1</version>
+        <version>3.5.0</version>
         <type>jar</type>
       </dependency>
       
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
-        <version>3.5.0-beta-1</version>
+        <version>3.5.0</version>
         <type>jar</type>
       </dependency>
       
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings-builder</artifactId>
-        <version>3.5.0-beta-1</version>
+        <version>3.5.0</version>
         <type>jar</type>
       </dependency>
 
@@ -88,7 +88,7 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-resolver-provider</artifactId>
-        <version>3.5.0-beta-1</version>
+        <version>3.5.0</version>
         <type>jar</type>
       </dependency>
 
@@ -123,7 +123,7 @@
       <dependency>
         <groupId>org.jboss.weld</groupId>
         <artifactId>weld-core-bom</artifactId>
-        <version>3.0.0.CR2</version>
+        <version>3.0.0.Final</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -365,7 +365,7 @@
     <findbugs.threshold>Medium</findbugs.threshold>
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <links>https://www.slf4j.org/api/,http://docs.jboss.org/cdi/api/2.0-PFD2/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.3.9/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/</links>
+    <links>https://www.slf4j.org/api/,http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.3.9/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/</links>
 
     <!-- maven-release-plugin properties -->
     <goals>deploy,site-deploy</goals>
