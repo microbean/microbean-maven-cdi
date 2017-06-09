@@ -10,7 +10,7 @@
   </prerequisites>
 
   <artifactId>microbean-maven-cdi</artifactId>
-  <version>0.1.3-SNAPSHOT</version>
+  <version>0.1.4-SNAPSHOT</version>
 
   <parent>
     <groupId>org.microbean</groupId>
@@ -66,7 +66,7 @@
         <version>3.5.0</version>
         <type>jar</type>
       </dependency>
-      
+
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
@@ -80,7 +80,7 @@
         <version>3.5.0</version>
         <type>jar</type>
       </dependency>
-
+      
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-api</artifactId>
