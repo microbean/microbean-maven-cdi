@@ -16,7 +16,11 @@
  */
 package org.microbean.maven.cdi;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable; // for javadoc only
 
 import java.lang.annotation.Documented;
@@ -25,14 +29,25 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+
+import java.util.jar.JarFile;
 
 import javax.enterprise.context.Dependent;
 
@@ -48,6 +63,7 @@ import javax.enterprise.inject.literal.SingletonLiteral;
 
 import javax.enterprise.inject.spi.AnnotatedField;
 import javax.enterprise.inject.spi.AnnotatedType;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
@@ -250,6 +266,26 @@ public class MavenExtension implements Extension {
 
 
   /*
+   * Instance fields.
+   */
+
+  
+  /**
+   * A {@link Map} of Maven artifact coordinates represented as {@link
+   * Properties} objects indexed by {@link URI} objects representing
+   * their location.
+   *
+   * <p>This field is never {@code null}.</p>
+   *
+   * <p>This field is not safe for concurrent use by multiple threads.
+   * Threads should synchronize on its value to coordinate access.</p>
+   *
+   * @see #getGroupArtifactVersionCoordinates(URL)
+   */
+  private final Map<URI, Properties> coordinates;
+  
+
+  /*
    * Constructors.
    */
 
@@ -259,6 +295,7 @@ public class MavenExtension implements Extension {
    */
   public MavenExtension() {
     super();
+    this.coordinates = new HashMap<>();
   }
 
 
@@ -448,6 +485,197 @@ public class MavenExtension implements Extension {
         }
       }
     }
+  }
+
+  /**
+   * Returns a {@link Properties} object containing the <a
+   * href="https://maven.apache.org/shared/maven-archiver/#pom-properties-content"
+   * target="_parent">contents of a {@code pom.properties} file as
+   * commonly installed in {@code .jar} files by Maven</a>.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>This method is not {@code final} due to CDI specification
+   * restrictions only.</p>
+   *
+   * @param location the location of the classpath element (a {@code
+   * .jar} file, or, perhaps, a directory); may be {@code null} in
+   * which case {@code null} will be returned
+   *
+   * @return a {@link Properties} object, or {@code null}
+   *
+   * @exception IOException if an input/output error occurs
+   *
+   * @exception URISyntaxException if there was a problem constructing
+   * a {@link URI}
+   */
+  public Properties getGroupArtifactVersionCoordinates(final URL location) throws IOException, URISyntaxException {
+    Properties returnValue = null;
+    if (location != null) {
+      final String path = location.getPath();
+
+      URL beanArchiveRoot = null;
+
+      String scheme = location.getProtocol();
+      if ("jar".equalsIgnoreCase(scheme)) {
+        beanArchiveRoot = new URL(location, "/"); // no jar entry, no matter what was passed in
+      } else if (path != null && path.endsWith(".jar")) {
+        beanArchiveRoot = new URL(new URL("jar", "", -1, location.toString() + "!/"), "/"); // normalize to jar URL with no jar entry
+      } else {
+        beanArchiveRoot = location; // no idea
+      }
+      assert beanArchiveRoot != null;
+
+      synchronized (this.coordinates) {
+        returnValue = this.coordinates.get(beanArchiveRoot.toURI());
+        if (returnValue == null) {
+          
+          scheme = beanArchiveRoot.getProtocol();
+          if ("jar".equalsIgnoreCase(scheme)) {
+            final JarURLConnection urlConnection = (JarURLConnection)beanArchiveRoot.openConnection();
+            if (urlConnection != null) {
+              try (final JarFile jarFile = urlConnection.getJarFile()) {
+                if (jarFile != null) {
+                  returnValue = jarFile.stream()
+                    .filter(e -> {
+                        final String name = e.getName();
+                        return name != null && name.startsWith("META-INF/maven/") && name.endsWith("/pom.properties");
+                      })
+                    .findAny() // there should be only one
+                    .map(jarEntry -> {
+                        Properties p = null;
+                        try (final InputStream inputStream = new BufferedInputStream(jarFile.getInputStream(jarEntry))) {
+                          if (inputStream != null) {
+                            p = new Properties();
+                            p.load(inputStream);
+                          }
+                        } catch (final IOException ioException) {
+                          throw new RuntimeException(ioException);
+                        }
+                        return p;
+                      })
+                    .orElse(null);
+                }
+              }
+            }
+          } else if ("file".equalsIgnoreCase(scheme)) {
+            File root = new File(beanArchiveRoot.toURI());
+            while (root != null) {
+              if (root.isDirectory()) {            
+                final File metaInfMaven = new File(root, "META-INF/maven");
+                if (metaInfMaven.isDirectory()) {
+                  
+                  File scanMe = metaInfMaven;
+                  while (scanMe != null && scanMe.isDirectory()) {
+                    
+                    final File[] subDirectories = scanMe.listFiles(f -> {
+                        if (f == null || !f.isDirectory()) {
+                          return false;
+                        }
+                        final String name = f.getName();
+                        return name != null && !name.startsWith(".");
+                      });
+                    
+                    if (subDirectories == null || subDirectories.length <= 0) {
+                      // We are looking for pom.properties in a
+                      // directory that has no further subdirectories.
+                      // We've found it.
+                      final File pomPropertiesFile = new File(scanMe, "pom.properties");
+                      scanMe = null;
+                      if (pomPropertiesFile.exists() && !pomPropertiesFile.isDirectory()) {
+                        returnValue = new Properties();
+                        try (final InputStream stream = new BufferedInputStream(new FileInputStream(pomPropertiesFile))) {
+                          returnValue.load(stream);
+                          beanArchiveRoot = root.toURI().toURL();
+                          root = null;
+                        }
+                      }
+                    } else if (subDirectories.length == 1) {
+                      scanMe = subDirectories[0];
+                    } else {
+                      scanMe = null;
+                    }
+                  }
+                  
+                } else {
+                  // For common local development purposes, see if
+                  // maven-archiver/pom.properties exists under our
+                  // root; this will give us coordinates for testing
+                  final File mavenArchiverPomProperties = new File(root, "maven-archiver/pom.properties");
+                  if (mavenArchiverPomProperties.exists() && !mavenArchiverPomProperties.isDirectory()) {
+                    returnValue = new Properties();
+                    try (final InputStream stream = new BufferedInputStream(new FileInputStream(mavenArchiverPomProperties))) {
+                      returnValue.load(stream);
+                      beanArchiveRoot = root.toURI().toURL();
+                      root = null;
+                    }
+                  }
+                }
+                if (root != null) {
+                  root = root.getParentFile();
+                }
+              } else if (root != null) {
+                root = root.getParentFile();
+              }
+            }
+          } else {
+            throw new IllegalStateException();
+          }
+          
+          if (returnValue == null ||
+              !returnValue.containsKey("groupId") ||
+              !returnValue.containsKey("artifactId") ||
+              !returnValue.containsKey("version")) {
+            returnValue = null;
+          } else {
+            this.coordinates.put(beanArchiveRoot.toURI(), returnValue);
+          }
+        }
+      }
+    }
+    return returnValue;
+  }
+
+  /**
+   * Given a {@link Bean}, returns a {@link URL} representing the
+   * classpath root from which its {@linkplain Bean#getBeanClass()
+   * bean class} originates.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param bean the {@link Bean} whose classpath root should be
+   * returned; may be {@code null} in which case {@code null} will be
+   * returned
+   *
+   * @return a {@link URL} representing a classpath root from which
+   * the supplied {@link Bean}'s {@linkplain Bean#getBeanClass() bean
+   * class} originates, or {@code null}
+   *
+   * @see #getGroupArtifactVersionCoordinates(URL)
+   *
+   * @see Bean#getBeanClass()
+   *
+   * @see Class#getProtectionDomain()
+   *
+   * @see ProtectionDomain#getCodeSource()
+   *
+   * @see CodeSource#getLocation()
+   */
+  public static final URL getBeanArchiveLocation(final Bean<?> bean) {
+    URL returnValue = null;
+    if (bean != null) {
+      final Class<?> beanClass = bean.getBeanClass();
+      if (beanClass != null) {
+        final ProtectionDomain protectionDomain = beanClass.getProtectionDomain();
+        if (protectionDomain != null) {
+          final CodeSource codeSource = protectionDomain.getCodeSource();
+          if (codeSource != null) {
+            returnValue = codeSource.getLocation();
+          }
+        }
+      }
+    }
+    return returnValue;
   }
 
 

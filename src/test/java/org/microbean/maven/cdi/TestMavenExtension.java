@@ -101,7 +101,7 @@ public class TestMavenExtension {
     assertNotNull(transferListener);
     
     final CollectRequest collectRequest = new CollectRequest();
-    final Artifact artifact = new DefaultArtifact("org.microbean", "microbean-configuration-cdi", "jar", "0.1.0");
+    final Artifact artifact = new DefaultArtifact("org.microbean", "microbean-configuration-cdi", "jar", "0.1.5");
     collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
     collectRequest.setRepositories(remoteRepositories);
 
