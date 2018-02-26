@@ -5,136 +5,113 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <prerequisites>
-    <maven>3.3.9</maven>
-  </prerequisites>
-
   <artifactId>microbean-maven-cdi</artifactId>
-  <version>0.1.4-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
 
   <parent>
     <groupId>org.microbean</groupId>
     <artifactId>microbean-pluginmanagement-pom</artifactId>
-    <version>3</version>
+    <version>5</version>
   </parent>
 
-  <name>MicroBean Maven CDI</name>
+  <name>microBean Maven CDI</name>
   <description>${project.name}</description>
-  <url>http://ljnelson.github.io/${project.artifactId}</url>  
+  <url>http://microbean.github.io/${project.artifactId}</url>  
 
   <scm>
-    <connection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</connection>
-    <developerConnection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</developerConnection>
-    <url>https://github.com/ljnelson/${project.artifactId}/</url>
+    <connection>scm:git:git@github.com:microbean/${project.artifactId}.git</connection>
+    <developerConnection>scm:git:git@github.com:microbean/${project.artifactId}.git</developerConnection>
+    <url>https://github.com/microbean/${project.artifactId}/</url>
     <tag>HEAD</tag>
   </scm>
 
   <dependencyManagement>
     <dependencies>
 
-      <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-        <version>1.3</version>
-        <type>jar</type>
-      </dependency>
+
+      <!-- Imports. -->
+
       
       <dependency>
-        <groupId>javax.enterprise</groupId>
-        <artifactId>cdi-api</artifactId>
-        <version>2.0</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.interceptor</groupId>
-        <artifactId>javax.interceptor-api</artifactId>
-        <version>1.2</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-model-builder</artifactId>
-        <version>3.5.0</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-resolver-provider</artifactId>
-        <version>3.5.0</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-settings</artifactId>
-        <version>3.5.0</version>
-        <type>jar</type>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-settings-builder</artifactId>
-        <version>3.5.0</version>
-        <type>jar</type>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-api</artifactId>
-        <version>1.0.3</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-connector-basic</artifactId>
-        <version>1.0.3</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-file</artifactId>
-        <version>1.0.3</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-http</artifactId>
-        <version>1.0.3</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-util</artifactId>
-        <version>1.0.3</version>
-        <type>jar</type>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.jboss</groupId>
-        <artifactId>jandex</artifactId>
-        <version>2.0.3.Final</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss.weld</groupId>
-        <artifactId>weld-core-bom</artifactId>
-        <version>3.0.0.Final</version>
+        <groupId>org.microbean</groupId>
+        <artifactId>microbean-base-specification</artifactId>
+        <version>0.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
 
       <dependency>
         <groupId>org.microbean</groupId>
-        <artifactId>microbean-main</artifactId>
-        <version>6</version>
+        <artifactId>microbean-weld-se-environment</artifactId>
+        <version>0.1.2</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+
+      <!-- Normal dependencies. -->
+
+      
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-model-builder</artifactId>
+        <version>3.5.2</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-resolver-provider</artifactId>
+        <version>3.5.2</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-settings</artifactId>
+        <version>3.5.2</version>
+        <type>jar</type>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-settings-builder</artifactId>
+        <version>3.5.2</version>
+        <type>jar</type>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-api</artifactId>
+        <version>1.1.1</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-connector-basic</artifactId>
+        <version>1.1.1</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-file</artifactId>
+        <version>1.1.1</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-http</artifactId>
+        <version>1.1.1</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-util</artifactId>
+        <version>1.1.1</version>
         <type>jar</type>
       </dependency>
 
@@ -145,18 +122,28 @@
         <type>jar</type>
       </dependency>
       
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>1.7.25</version>
-        <type>jar</type>
-      </dependency>
-      
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
 
+    <!-- Test-scoped dependencies. -->
+
+
+    <dependency>
+      <groupId>org.microbean</groupId>
+      <artifactId>microbean-weld-se-environment</artifactId>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+    
     <!-- Compile-scoped dependencies. -->
 
     <dependency>
@@ -221,77 +208,23 @@
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <version>1.7.25</version>
       <type>jar</type>
-      <scope>compile</scope>
     </dependency>
-
+    
     <!-- Provided-scoped dependencies. -->
 
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-      <type>jar</type>
-      <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-      <type>jar</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.interceptor</groupId>
-      <artifactId>javax.interceptor-api</artifactId>
-      <type>jar</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- Runtime-scoped dependencies. -->
-    
-    <dependency>
-      <groupId>org.jboss</groupId>
-      <artifactId>jandex</artifactId>
-      <type>jar</type>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    
-    <!-- Test-scoped dependencies. -->
-    
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <type>jar</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.weld.se</groupId>
-      <artifactId>weld-se-core</artifactId>
-      <type>jar</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.microbean</groupId>
-      <artifactId>microbean-main</artifactId>
-      <type>jar</type>
-      <scope>test</scope>
+      <artifactId>microbean-base-specification</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <type>jar</type>
-      <scope>test</scope>
-    </dependency>
-    
   </dependencies>
 
   <build>
@@ -368,10 +301,11 @@
     <findbugs.threshold>Medium</findbugs.threshold>
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <links>https://www.slf4j.org/api/,http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.5.0/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/</links>
+    <links>https://www.slf4j.org/api/,http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.5.2/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/</links>
 
     <!-- maven-release-plugin properties -->
     <goals>deploy,site-deploy</goals>
+    <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
     
     <!-- Weld logging; see https://docs.jboss.org/weld/reference/latest/en-US/html/logging.html#_weld_se -->
     <org.jboss.logging.provider>slf4j</org.jboss.logging.provider>

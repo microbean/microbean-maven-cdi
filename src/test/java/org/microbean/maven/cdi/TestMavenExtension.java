@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.eclipse.aether.transfer.TransferListener;
@@ -118,6 +119,15 @@ public class TestMavenExtension {
     Main.main(null);
     assertEquals(oldInstanceCount + 1, instanceCount);
   }
-  
+
+
+  /*
+   * Static methods.
+   */
+
+  @BeforeClass
+  public static void setUpLogging() {
+    System.setProperty("java.util.logging.config.file", Thread.currentThread().getContextClassLoader().getResource("logging.properties").getPath());
+  }
   
 }
