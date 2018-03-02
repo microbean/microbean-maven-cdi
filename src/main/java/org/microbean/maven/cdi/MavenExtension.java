@@ -351,9 +351,9 @@ public class MavenExtension implements Extension {
       //
       
       event.addAnnotatedType(ClassicDependencyManager.class, "maven").add(SingletonLiteral.INSTANCE);
-      // See https://issues.apache.org/jira/browse/MNG-6190; when this
-      // is fixed, this line can be restored and the relevant producer
-      // method (see below) removed.
+      // TODO: see https://issues.apache.org/jira/browse/MNG-6190;
+      // when this is fixed, this line can be restored and the
+      // relevant producer method (see below) removed.
       // event.addAnnotatedType(DefaultArtifactDescriptorReader.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultVersionRangeResolver.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultVersionResolver.class, "maven").add(SingletonLiteral.INSTANCE);

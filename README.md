@@ -1,6 +1,9 @@
-# MicroBean Maven CDI
+# microBean Maven CDI
 
-The MicroBean Maven CDI project embeds the [Maven machinery responsible
+[![Build Status](https://travis-ci.org/microbean/microbean-maven-cdi.svg?branch=master)](https://travis-ci.org/microbean/microbean-maven-cdi)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.microbean/microbean-maven-cdi/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.microbean/microbean-maven-cdi)
+
+The microBean Maven CDI project embeds the [Maven machinery responsible
 for interacting with artifact repositories][2] into your CDI 2.0
 environment.
 
@@ -47,13 +50,13 @@ It also depends on certain parts of Maven that are expressed as [Plexus
 components][11].  (Plexus was one of the first dependency injection
 containers and still has its fingerprints in the Maven innards.)
 
-The MicroBean Maven CDI project does just enough work to re-express
+The microBean Maven CDI project does just enough work to re-express
 certain Plexus components using CDI constructs so that you may simply
 inject the parts of `maven-resolver` that you need.
 
 For example, to work with artifact repositories, you're going to need
 a [`RepositorySystem`][12] and a [`RepositorySystemSession`][13].
-With MicroBean Maven CDI, you simply do this:
+With microBean Maven CDI, you simply do this:
 
     @Inject
     private RepositorySystem repositorySystem;
@@ -65,7 +68,7 @@ With MicroBean Maven CDI, you simply do this:
 of setting up the dozens of supporting objects for you behind the
 scenes.
 
-MicroBean Maven CDI also natively understands your
+microBean Maven CDI also natively understands your
 user-level [`~/.m2/settings.xml` file][15], and can use it so that you
 can inject the right remote repositories, even taking
 its [local repository][17] and [mirrors][16] settings into
