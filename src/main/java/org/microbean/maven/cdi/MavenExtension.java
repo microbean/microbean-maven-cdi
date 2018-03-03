@@ -351,10 +351,7 @@ public class MavenExtension implements Extension {
       //
       
       event.addAnnotatedType(ClassicDependencyManager.class, "maven").add(SingletonLiteral.INSTANCE);
-      // TODO: see https://issues.apache.org/jira/browse/MNG-6190;
-      // when this is fixed, this line can be restored and the
-      // relevant producer method (see below) removed.
-      // event.addAnnotatedType(DefaultArtifactDescriptorReader.class, "maven").add(SingletonLiteral.INSTANCE);
+      event.addAnnotatedType(DefaultArtifactDescriptorReader.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultVersionRangeResolver.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultVersionResolver.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(FatArtifactTraverser.class, "maven").add(SingletonLiteral.INSTANCE);
@@ -1235,74 +1232,6 @@ public class MavenExtension implements Extension {
     @Singleton
     private static final ArtifactDescriptorPolicy produceArtifactDescriptorPolicy() {
       return new SimpleArtifactDescriptorPolicy(true /* ignoreMissing */, true /* ignoreInvalid */);
-    }
-
-    /**
-     * Returns a {@link DefaultArtifactDescriptorReader} in {@link
-     * Singleton} scope.
-     *
-     * <h2>Implementation Notes</h2>
-     *
-     * <p>This method is only necessary until <a
-     * href="https://issues.apache.org/jira/browse/MNG-6190">MNG-6190</a>
-     * is fixed and can then be removed in favor of a simple {@link
-     * BeforeBeanDiscovery#addAnnotatedType(Class, String)}
-     * invocation.</p>
-     *
-     * @param remoteRepositoryManager the {@link
-     * RemoteRepositoryManager} to build the {@link
-     * DefaultArtifactDescriptorReader} with; must not be {@code null}
-     *
-     * @param versionResolver the {@link VersionResolver} to build the
-     * {@link DefaultArtifactDescriptorReader} with; must not be
-     * {@code null}
-     *
-     * @param versionRangeResolver the {@link VersionRangeResolver} to
-     * build the {@link DefaultArtifactDescriptorReader} with; must
-     * not be {@code null}
-     *
-     * @param artifactResolver the {@link ArtifactResolver} to build
-     * the {@link DefaultArtifactDescriptorReader} with; must not be
-     * {@code null}
-     *
-     * @param modelBuilder the {@link ModelBuilder} to build the
-     * {@link DefaultArtifactDescriptorReader} with; must not be
-     * {@code null}
-     *
-     * @param repositoryEventDispatcher the {@link
-     * RepositoryEventDispatcher} to build the {@link
-     * DefaultArtifactDescriptorReader} with; must not be {@code null}
-     *
-     * @param loggerFactory the {@link
-     * org.eclipse.aether.spi.log.LoggerFactory} to build the {@link
-     * DefaultArtifactDescriptorReader} with; must not be {@code null}
-     *
-     * @return a new {@link DefaultArtifactDescriptorReader}; never
-     * {@code null}
-     *
-     * @exception NullPointerException if any parameter is {@code
-     * null}
-     *
-     * @see <a href="https://issues.apache.org/jira/browse/MNG-6190">MNG-6190</a>
-     */
-    @Produces
-    @Singleton
-    private static final ArtifactDescriptorReader produceArtifactDescriptorReader(final RemoteRepositoryManager remoteRepositoryManager,
-                                                                                  final VersionResolver versionResolver,
-                                                                                  final VersionRangeResolver versionRangeResolver,
-                                                                                  final ArtifactResolver artifactResolver,
-                                                                                  final ModelBuilder modelBuilder,
-                                                                                  final RepositoryEventDispatcher repositoryEventDispatcher,
-                                                                                  final org.eclipse.aether.spi.log.LoggerFactory loggerFactory) {
-      final DefaultArtifactDescriptorReader returnValue = new DefaultArtifactDescriptorReader();
-      returnValue.setRemoteRepositoryManager(remoteRepositoryManager);
-      returnValue.setVersionResolver(versionResolver);
-      returnValue.setVersionRangeResolver(versionRangeResolver);
-      returnValue.setArtifactResolver(artifactResolver);
-      returnValue.setModelBuilder(modelBuilder);
-      returnValue.setRepositoryEventDispatcher(repositoryEventDispatcher);
-      returnValue.setLoggerFactory(loggerFactory);
-      return returnValue;
     }
 
 
