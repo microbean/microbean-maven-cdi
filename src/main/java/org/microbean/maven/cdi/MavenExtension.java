@@ -269,7 +269,7 @@ public class MavenExtension implements Extension {
    * Instance fields.
    */
 
-  
+
   /**
    * A {@link Map} of Maven artifact coordinates represented as {@link
    * Properties} objects indexed by {@link URI} objects representing
@@ -283,7 +283,7 @@ public class MavenExtension implements Extension {
    * @see #getGroupArtifactVersionCoordinates(URL)
    */
   private final Map<URI, Properties> coordinates;
-  
+
 
   /*
    * Constructors.
@@ -302,7 +302,7 @@ public class MavenExtension implements Extension {
   /*
    * Instance methods.
    */
-  
+
 
   /**
    * Registers certain Maven Resolver components as CDI beans in
@@ -322,7 +322,7 @@ public class MavenExtension implements Extension {
       //
       // Types effectively bound by DefaultServiceLocator
       //
-      
+
       event.addAnnotatedType(DefaultArtifactResolver.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultChecksumPolicyProvider.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultDependencyCollector.class, "maven").add(SingletonLiteral.INSTANCE);
@@ -349,7 +349,7 @@ public class MavenExtension implements Extension {
       //
       // Types effectively bound by MavenRepositorySystemUtils
       //
-      
+
       event.addAnnotatedType(ClassicDependencyManager.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultArtifactDescriptorReader.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultVersionRangeResolver.class, "maven").add(SingletonLiteral.INSTANCE);
@@ -361,7 +361,7 @@ public class MavenExtension implements Extension {
       //
       // Types effectively bound by DefaultModelBuilderFactory
       //
-      
+
       event.addAnnotatedType(DefaultDependencyManagementImporter.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultDependencyManagementInjector.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultInheritanceAssembler.class, "maven").add(SingletonLiteral.INSTANCE);
@@ -402,7 +402,7 @@ public class MavenExtension implements Extension {
       event.addAnnotatedType(DefaultSettingsValidator.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultSettingsWriter.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(FileTransporterFactory.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(HttpTransporterFactory.class, "maven").add(SingletonLiteral.INSTANCE);      
+      event.addAnnotatedType(HttpTransporterFactory.class, "maven").add(SingletonLiteral.INSTANCE);
 
     }
   }
@@ -526,7 +526,7 @@ public class MavenExtension implements Extension {
       synchronized (this.coordinates) {
         returnValue = this.coordinates.get(beanArchiveRoot.toURI());
         if (returnValue == null) {
-          
+
           scheme = beanArchiveRoot.getProtocol();
           if ("jar".equalsIgnoreCase(scheme)) {
             final JarURLConnection urlConnection = (JarURLConnection)beanArchiveRoot.openConnection();
@@ -558,13 +558,13 @@ public class MavenExtension implements Extension {
           } else if ("file".equalsIgnoreCase(scheme)) {
             File root = new File(beanArchiveRoot.toURI());
             while (root != null) {
-              if (root.isDirectory()) {            
+              if (root.isDirectory()) {
                 final File metaInfMaven = new File(root, "META-INF/maven");
                 if (metaInfMaven.isDirectory()) {
-                  
+
                   File scanMe = metaInfMaven;
                   while (scanMe != null && scanMe.isDirectory()) {
-                    
+
                     final File[] subDirectories = scanMe.listFiles(f -> {
                         if (f == null || !f.isDirectory()) {
                           return false;
@@ -572,7 +572,7 @@ public class MavenExtension implements Extension {
                         final String name = f.getName();
                         return name != null && !name.startsWith(".");
                       });
-                    
+
                     if (subDirectories == null || subDirectories.length <= 0) {
                       // We are looking for pom.properties in a
                       // directory that has no further subdirectories.
@@ -593,7 +593,7 @@ public class MavenExtension implements Extension {
                       scanMe = null;
                     }
                   }
-                  
+
                 } else {
                   // For common local development purposes, see if
                   // maven-archiver/pom.properties exists under our
@@ -618,7 +618,7 @@ public class MavenExtension implements Extension {
           } else {
             throw new IllegalStateException();
           }
-          
+
           if (returnValue == null ||
               !returnValue.containsKey("groupId") ||
               !returnValue.containsKey("artifactId") ||
@@ -679,7 +679,7 @@ public class MavenExtension implements Extension {
   /*
    * Inner and nested classes.
    */
-  
+
 
   /**
    * A class housing several <a
@@ -779,6 +779,7 @@ public class MavenExtension implements Extension {
       if (m2Home != null) {
         request.setGlobalSettingsFile(new File(new File(m2Home), "conf/settings.xml"));
       }
+      
       request.setUserSettingsFile(new File(new File(System.getProperty("user.home")), ".m2/settings.xml")); // TODO: from configuration, too
       final SettingsBuildingResult settingsBuildingResult = settingsBuilder.build(request);
       assert settingsBuildingResult != null;
@@ -935,19 +936,19 @@ public class MavenExtension implements Extension {
                   for (final Repository repository : repositories) {
                     if (repository != null) {
                       RemoteRepository.Builder builder = new RemoteRepository.Builder(repository.getId(), repository.getLayout(), repository.getUrl());
-                      
+
                       final org.apache.maven.settings.RepositoryPolicy settingsReleasePolicy = repository.getReleases();
                       if (settingsReleasePolicy != null) {
                         final org.eclipse.aether.repository.RepositoryPolicy releasePolicy = new org.eclipse.aether.repository.RepositoryPolicy(settingsReleasePolicy.isEnabled(), settingsReleasePolicy.getUpdatePolicy(), settingsReleasePolicy.getChecksumPolicy());
                         builder = builder.setReleasePolicy(releasePolicy);
                       }
-                      
+
                       final org.apache.maven.settings.RepositoryPolicy settingsSnapshotPolicy = repository.getSnapshots();
                       if (settingsSnapshotPolicy != null) {
                         final org.eclipse.aether.repository.RepositoryPolicy snapshotPolicy = new org.eclipse.aether.repository.RepositoryPolicy(settingsSnapshotPolicy.isEnabled(), settingsSnapshotPolicy.getUpdatePolicy(), settingsSnapshotPolicy.getChecksumPolicy());
                         builder = builder.setSnapshotPolicy(snapshotPolicy);
                       }
-                      
+
                       final RemoteRepository remoteRepository = builder.build();
                       assert remoteRepository != null;
                       remoteRepositories.add(remoteRepository);
@@ -1144,7 +1145,7 @@ public class MavenExtension implements Extension {
     @Produces
     @Singleton
     private static final DependencySelector produceDependencySelector() {
-      return new AndDependencySelector(new ScopeDependencySelector("test", "provided"),
+      return new AndDependencySelector(new ScopeDependencySelector("test", "provided"), // excludes test and provided scopes
                                        new OptionalDependencySelector(),
                                        new ExclusionDependencySelector());
     }
@@ -1347,7 +1348,7 @@ public class MavenExtension implements Extension {
     private static final Set<RepositoryConnectorFactory> produceRepositoryConnectorFactorySet(@Any final Instance<RepositoryConnectorFactory> repositoryConnectorFactories) {
       return produceSet(repositoryConnectorFactories);
     }
-    
+
     /**
      * Converts an {@link Instance} of {@link
      * MetadataGeneratorFactory} instances into a {@link Set} of such
@@ -1405,12 +1406,12 @@ public class MavenExtension implements Extension {
    */
   private static final class StubLifecycleBindingsInjector implements LifecycleBindingsInjector {
 
-    
+
     /*
      * Instance methods.
      */
 
-    
+
     /**
      * Does nothing when invoked.
      *
@@ -1424,7 +1425,7 @@ public class MavenExtension implements Extension {
     public final void injectLifecycleBindings(final Model model, final ModelBuildingRequest modelBuildingRequest, final ModelProblemCollector modelProblemCollector) {
 
     }
-    
+
   }
 
   /**
@@ -1448,7 +1449,7 @@ public class MavenExtension implements Extension {
      * Annotation elements.
      */
 
-    
+
     /**
      * The value of the hint.
      *
@@ -1461,7 +1462,7 @@ public class MavenExtension implements Extension {
      * Inner and nested classes.
      */
 
-    
+
     /**
      * An {@link AnnotationLiteral} that represents an instance of the
      * {@link Hinted} annotation.
@@ -1478,19 +1479,19 @@ public class MavenExtension implements Extension {
        * Static fields.
        */
 
-      
+
       /**
        * The version of this class for {@linkplain Serializable
        * serialization purposes}.
        */
       private static final long serialVersionUID = 1L;
-      
-      
+
+
       /*
        * Instance fields.
        */
 
-      
+
       /**
        * The hint being represented.
        *
@@ -1521,7 +1522,7 @@ public class MavenExtension implements Extension {
       /*
        * Instance methods.
        */
-      
+
 
       /**
        * Returns the value of this {@link Literal}.
@@ -1549,9 +1550,9 @@ public class MavenExtension implements Extension {
       private static final Hinted of(final String value) {
         return new Literal(value);
       }
-      
+
     }
-    
+
   }
-  
+
 }
