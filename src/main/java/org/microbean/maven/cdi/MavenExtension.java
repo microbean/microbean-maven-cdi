@@ -18,7 +18,6 @@ package org.microbean.maven.cdi;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable; // for javadoc only
@@ -33,6 +32,10 @@ import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
@@ -81,7 +84,6 @@ import org.apache.maven.model.Model;
 
 import org.apache.maven.model.building.DefaultModelBuilder;
 import org.apache.maven.model.building.DefaultModelProcessor;
-import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 
@@ -165,14 +167,8 @@ import org.eclipse.aether.collection.DependencyTraverser;
 
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 
-import org.eclipse.aether.impl.ArtifactDescriptorReader;
-import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.LocalRepositoryProvider;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
-import org.eclipse.aether.impl.RepositoryEventDispatcher;
-import org.eclipse.aether.impl.VersionRangeResolver;
-import org.eclipse.aether.impl.VersionResolver;
 
 import org.eclipse.aether.internal.impl.DefaultArtifactResolver;
 import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
@@ -241,6 +237,8 @@ import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
+
+import org.microbean.configuration.cdi.annotation.ConfigurationValue;
 
 import org.microbean.maven.cdi.annotation.Resolution;
 
@@ -581,7 +579,7 @@ public class MavenExtension implements Extension {
                       scanMe = null;
                       if (pomPropertiesFile.exists() && !pomPropertiesFile.isDirectory()) {
                         returnValue = new Properties();
-                        try (final InputStream stream = new BufferedInputStream(new FileInputStream(pomPropertiesFile))) {
+                        try (final InputStream stream = new BufferedInputStream(Files.newInputStream(pomPropertiesFile.toPath()))) {
                           returnValue.load(stream);
                           beanArchiveRoot = root.toURI().toURL();
                           root = null;
@@ -601,7 +599,7 @@ public class MavenExtension implements Extension {
                   final File mavenArchiverPomProperties = new File(root, "maven-archiver/pom.properties");
                   if (mavenArchiverPomProperties.exists() && !mavenArchiverPomProperties.isDirectory()) {
                     returnValue = new Properties();
-                    try (final InputStream stream = new BufferedInputStream(new FileInputStream(mavenArchiverPomProperties))) {
+                    try (final InputStream stream = new BufferedInputStream(Files.newInputStream(mavenArchiverPomProperties.toPath()))) {
                       returnValue.load(stream);
                       beanArchiveRoot = root.toURI().toURL();
                       root = null;
@@ -743,6 +741,13 @@ public class MavenExtension implements Extension {
      * ultimately be used to create this method's return value; must
      * not be {@code null}
      *
+     * @param mavenHomePath a {@link Path} describing a Maven home
+     * directory for the purposes of locating the global settings
+     * file; may be {@code null}
+     *
+     * @param userSettingsPath a {@link Path} representing where the
+     * user's {@code settings.xml} file lives; may be {@code null}
+     *
      * @return a {@link Settings} object; never {@code null}
      *
      * @exception NullPointerException if {@code settingsBuilder} is
@@ -756,7 +761,19 @@ public class MavenExtension implements Extension {
      */
     @Produces
     @Singleton
-    private static final Settings produceSettings(final SettingsBuilder settingsBuilder) throws SettingsBuildingException {
+    private static final Settings produceSettings(final SettingsBuilder settingsBuilder,
+                                                  @ConfigurationValue(value = {
+                                                      "maven.home",
+                                                      "M2_HOME"
+                                                    })
+                                                  final Path mavenHomePath,
+                                                  @ConfigurationValue(value = {
+                                                      "org.microbean.maven.cdi.userSettingsPath",
+                                                      "SETTINGS_PATH"
+                                                    },
+                                                    defaultValue = "${configurations[\"user.home\"]}/.m2/settings.xml")
+                                                  final Path userSettingsPath)
+      throws SettingsBuildingException {
       Objects.requireNonNull(settingsBuilder);
       final DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
       final Properties requestSystemProperties = new Properties();
@@ -772,15 +789,29 @@ public class MavenExtension implements Extension {
       }
       request.setSystemProperties(requestSystemProperties);
       // request.setUserProperties(userProperties); // TODO: implement this
-      String m2Home = System.getProperty("maven.home");
-      if (m2Home == null) {
-        m2Home = System.getenv("M2_HOME");
+      final File globalSettingsFile;
+      if (mavenHomePath == null) {
+        String m2Home = System.getProperty("maven.home");
+        if (m2Home == null) {
+          m2Home = System.getenv("M2_HOME");
+        }
+        if (m2Home == null) {
+          globalSettingsFile = null;
+        } else {
+          globalSettingsFile = Paths.get(m2Home, "conf", "settings.xml").toFile();
+        }
+      } else {
+        globalSettingsFile = mavenHomePath.resolve(Paths.get("conf", "settings.xml")).toFile();
       }
-      if (m2Home != null) {
-        request.setGlobalSettingsFile(new File(new File(m2Home), "conf/settings.xml"));
+      request.setGlobalSettingsFile(globalSettingsFile);
+
+      final File userSettingsFile;
+      if (userSettingsPath == null) {
+        userSettingsFile = Paths.get(System.getProperty("user.home"), ".m2", "settings.xml").toFile();
+      } else {
+        userSettingsFile = userSettingsPath.toFile();
       }
-      
-      request.setUserSettingsFile(new File(new File(System.getProperty("user.home")), ".m2/settings.xml")); // TODO: from configuration, too
+      request.setUserSettingsFile(userSettingsFile);
       final SettingsBuildingResult settingsBuildingResult = settingsBuilder.build(request);
       assert settingsBuildingResult != null;
       final List<SettingsProblem> settingsBuildingProblems = settingsBuildingResult.getProblems();
