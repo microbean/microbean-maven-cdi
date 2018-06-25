@@ -230,7 +230,9 @@ public class MavenArtifactClassLoader extends URLClassLoader {
    * <p>The format of the {@link String} that is returned is exactly
    * like a classpath string appropriate for the current platform with
    * the exception that the platform-specific classpath separator is
-   * doubled.</p>
+   * doubled if any of the {@link URL}s {@linkplain #getURLs()
+   * belonging to this <code>MavenArtifactClassLoader</code>} is not a
+   * {@code file} URL.</p>
    *
    * <p>For any given {@link URL}, the returned {@link String} will
    * represent it as its {@linkplain URL#toExternalForm()
@@ -244,21 +246,35 @@ public class MavenArtifactClassLoader extends URLClassLoader {
    * <code>URL</code>s} represented as described above
    */
   public String toClasspath() {
-    final StringBuilder sb = new StringBuilder();
+    final String returnValue;
     final URL[] urls = this.getURLs();
     if (urls != null && urls.length > 0) {
+      final StringBuilder sb = new StringBuilder();
+      boolean allFileProtocols = true;
       final String separator = classpathSeparator + classpathSeparator;
       for (int i = 0; i < urls.length; i++) {
         final URL url = urls[i];
-        if (url != null && "file".equals(url.getProtocol())) {
-          sb.append(url.getPath());
+        if (url != null) {
+          if ("file".equals(url.getProtocol())) {
+            sb.append(url.getPath());
+          } else {
+            allFileProtocols = false;
+            sb.append(url.toString());
+          }
           if (i + 1 < urls.length) {
             sb.append(separator);
           }
         }
       }
+      if (allFileProtocols) {
+        returnValue = sb.toString().replace(separator, classpathSeparator);
+      } else {
+        returnValue = sb.toString();
+      }
+    } else {
+      returnValue = "";
     }
-    return sb.toString();
+    return returnValue;
   }
 
 
