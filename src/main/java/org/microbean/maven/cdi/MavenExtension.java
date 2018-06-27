@@ -703,19 +703,23 @@ public class MavenExtension implements Extension {
      *
      * <p>This method never returns {@code null}.</p>
      *
-     * @param settings the {@link Settings} object containing the raw
-     * materials necessary for the production of a {@link
-     * MirrorSelector}; may be {@code null} in which case a new {@link
-     * MirrorSelector} will be returned
+     * @param settingsInstance an {@link Instance} of {@link Settings}
+     * that may be {@linkplain Instance#isUnsatisfied() unsatisfied}
+     * that contains information about mirrors; must not be {@code
+     * null}
      *
      * @return a {@link MirrorSelector}; never {@code null}
+     *
+     * @exception NullPointerException if {@code settingsInstance} is
+     * {@code null}
      */
     @Produces
     @Singleton
-    private static final MirrorSelector produceMirrorSelector(final Settings settings) {
+    private static final MirrorSelector produceMirrorSelector(final Instance<Settings> settingsInstance) {
+      Objects.requireNonNull(settingsInstance);
       final DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
-      if (settings != null) {
-        final Collection<? extends Mirror> mirrors = settings.getMirrors();
+      if (settingsInstance.isResolvable()) {
+        final Collection<? extends Mirror> mirrors = settingsInstance.get().getMirrors();
         if (mirrors != null && !mirrors.isEmpty()) {
           for (final Mirror mirror : mirrors) {
             assert mirror != null;
@@ -892,23 +896,31 @@ public class MavenExtension implements Extension {
      *
      * <p>This method never returns {@code null}.</p>
      *
-     * @param settings the {@link Settings} object whose {@link
-     * Settings#getLocalRepository()} method might return the location
-     * of the local repository; may be {@code null} in which case a
-     * {@link LocalRepository} representing the location formed by the
-     * concatenation of the value of the {@code user.home} System
-     * property and the {@link String} {@code /.m2/repository}
+     * @param mavenRepoLocal the value of the {@code maven.repo.local}
+     * configuration property; may be (and often is) {@code null}
+     *
+     * @param settingsInstance an {@link Instance} of {@link Settings}
+     * that may be {@linkplain Instance#isUnsatisfied() unsatisfied}
+     * that contains information about where a local Maven repository
+     * can be found; must not be {@code null}
      *
      * @return a {@link LocalRepository}; never {@code null}
+     *
+     * @exception NullPointerException if {@code settingsInstance} is
+     * {@code null}
      *
      * @see Settings#getLocalRepository()
      */
     @Produces
     @Singleton
-    private static final LocalRepository produceLocalRepository(final Settings settings) {
-      String localRepositoryString = null;
-      if (settings != null) {
-        localRepositoryString = settings.getLocalRepository();
+    private static final LocalRepository produceLocalRepository(@ConfigurationValue("maven.repo.local")
+                                                                final String mavenRepoLocal,
+                                                                final Instance<Settings> settingsInstance) {
+      // TODO: see https://github.com/apache/maven/blob/eb6b212b567c287734a2dbbef3c113fe650f1def/maven-core/src/main/java/org/apache/maven/internal/aether/DefaultRepositorySystemSessionFactory.java#L133
+      Objects.requireNonNull(settingsInstance);
+      String localRepositoryString = mavenRepoLocal;
+      if (localRepositoryString == null && settingsInstance.isResolvable()) {
+        localRepositoryString = settingsInstance.get().getLocalRepository();
       }
       if (localRepositoryString == null) {
         localRepositoryString = System.getProperty("user.home") + "/.m2/repository";
@@ -926,9 +938,10 @@ public class MavenExtension implements Extension {
      *
      * <p>This method will never return {@code null}.</p>
      *
-     * @param settings the {@link Settings} object whose {@linkplain
-     * Settings#getActiveProfiles() active profiles} will be read for
-     * repository locations; may be {@code null}
+     * @param settingsInstance an {@link Instance} of {@link Settings}
+     * that may be {@linkplain Instance#isUnsatisfied() unsatisfied}
+     * that contains information about where remote Maven repositories
+     * may be found; must not be {@code null}
      *
      * @param repositorySystem the {@link RepositorySystem} whose
      * {@link
@@ -943,18 +956,22 @@ public class MavenExtension implements Extension {
      * {@code null}
      *
      * @exception NullPointerException if either {@code
-     * repositorySystem} or {@code session} is {@code null}
+     * settingsInstance}, {@code repositorySystem} or {@code session}
+     * is {@code null}
      */
     @Produces
     @Dependent
     @Resolution
-    private static final List<RemoteRepository> produceRemoteRepositoryList(final Settings settings,
+    private static final List<RemoteRepository> produceRemoteRepositoryList(final Instance<Settings> settingsInstance,
                                                                             final RepositorySystem repositorySystem,
                                                                             final RepositorySystemSession session) {
+      Objects.requireNonNull(settingsInstance);
       Objects.requireNonNull(repositorySystem);
       Objects.requireNonNull(session);
       List<RemoteRepository> remoteRepositories = new ArrayList<>();
-      if (settings != null) {
+      if (settingsInstance.isResolvable()) {
+        final Settings settings = settingsInstance.get();
+        assert settings != null;
         final Map<String, Profile> profiles = settings.getProfilesAsMap();
         if (profiles != null && !profiles.isEmpty()) {
           final Collection<String> activeProfileKeys = settings.getActiveProfiles();
@@ -1034,9 +1051,10 @@ public class MavenExtension implements Extension {
      * ArtifactDescriptorPolicy} that controls what to do with missing
      * or invalid artifacts; may be {@code null}
      *
-     * @param settings a {@link Settings} object whose {@link
-     * Settings#isOffline()} method will be consulted; may be {@code
-     * null}
+     * @param settingsInstance an {@link Instance} of {@link Settings}
+     * that may be {@linkplain Instance#isUnsatisfied() unsatisfied}
+     * that may be consulted for offline status information; must not
+     * be {@code null}
      *
      * @param mirrorSelector a {@link MirrorSelector} that will choose
      * the appropriate mirror for a given repository; may be {@code
@@ -1098,9 +1116,9 @@ public class MavenExtension implements Extension {
      *
      * @see DefaultRepositorySystemSession#setOffline(boolean)
      *
-     * @see #produceMirrorSelector(Settings)
+     * @see #produceMirrorSelector(Instance)
      *
-     * @see #produceLocalRepository(Settings)
+     * @see #produceLocalRepository(String, Instance)
      *
      * @see
      * LocalRepositoryProvider#newLocalRepositoryManager(RepositorySystemSession,
@@ -1119,12 +1137,13 @@ public class MavenExtension implements Extension {
                                                                                 final DependencyGraphTransformer dependencyGraphTransformer,
                                                                                 final ArtifactTypeRegistry artifactTypeRegistry,
                                                                                 final ArtifactDescriptorPolicy artifactDescriptorPolicy,
-                                                                                final Settings settings,
+                                                                                final Instance<Settings> settingsInstance,
                                                                                 final MirrorSelector mirrorSelector,
                                                                                 final LocalRepository localRepository,
                                                                                 final LocalRepositoryProvider localRepositoryProvider,
                                                                                 final Instance<TransferListener> transferListenerInstance)
     throws NoLocalRepositoryManagerException {
+      Objects.requireNonNull(settingsInstance);
       final DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
       session.setDependencyTraverser(dependencyTraverser);
       session.setDependencyManager(dependencyManager);
@@ -1145,8 +1164,8 @@ public class MavenExtension implements Extension {
       }
       session.setSystemProperties(sessionSystemProperties);
       session.setConfigProperties(sessionSystemProperties);
-      if (settings != null) {
-        session.setOffline(settings.isOffline());
+      if (settingsInstance.isResolvable()) {
+        session.setOffline(settingsInstance.get().isOffline());
       }
       session.setMirrorSelector(mirrorSelector);
       final LocalRepositoryManager localRepositoryManager = localRepositoryProvider.newLocalRepositoryManager(session, localRepository);
