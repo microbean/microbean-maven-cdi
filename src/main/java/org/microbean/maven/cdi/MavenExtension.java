@@ -749,6 +749,13 @@ public class MavenExtension implements Extension {
      * directory for the purposes of locating the global settings
      * file; may be {@code null}
      *
+     * @param mavenConfPath a {@link Path} describing a Maven global
+     * configuration directory for the purposes of locating the global
+     * settings file; may be {@code null}
+     *
+     * @param globalSettingsPath a {@link Path} representing where the
+     * global {@code settings.xml} file lives; may be {@code null}
+     *
      * @param userSettingsPath a {@link Path} representing where the
      * user's {@code settings.xml} file lives; may be {@code null}
      *
@@ -766,46 +773,64 @@ public class MavenExtension implements Extension {
     @Produces
     @Singleton
     private static final Settings produceSettings(final SettingsBuilder settingsBuilder,
+
                                                   @ConfigurationValue(value = {
                                                       "maven.home",
                                                       "M2_HOME"
                                                     })
-                                                  final Path mavenHomePath,
+                                                  Path mavenHomePath,
+
+                                                  @ConfigurationValue(value = {
+                                                      "maven.conf"
+                                                    })
+                                                  Path mavenConfPath,
+
+                                                  @ConfigurationValue(value = {
+                                                      "org.microbean.maven.cdi.globalSettingsPath",
+                                                      "GLOBAL_SETTINGS_PATH"
+                                                    })
+                                                  Path globalSettingsPath,
+
                                                   @ConfigurationValue(value = {
                                                       "org.microbean.maven.cdi.userSettingsPath",
-                                                      "SETTINGS_PATH"
+                                                      "USER_SETTINGS_PATH"
                                                     },
                                                     defaultValue = "${configurations[\"user.home\"]}/.m2/settings.xml")
                                                   final Path userSettingsPath)
       throws SettingsBuildingException {
       Objects.requireNonNull(settingsBuilder);
       final DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-      final Properties requestSystemProperties = new Properties();
-      final Properties systemProperties = System.getProperties();
-      synchronized (systemProperties) {
-        final Set<String> keys = systemProperties.stringPropertyNames();
-        if (keys != null) {
-          for (final String key : keys) {
-            assert key != null;
-            requestSystemProperties.setProperty(key, systemProperties.getProperty(key));
-          }
-        }
-      }
-      request.setSystemProperties(requestSystemProperties);
+      request.setSystemProperties(System.getProperties());
       // request.setUserProperties(userProperties); // TODO: implement this
+      
       final File globalSettingsFile;
-      if (mavenHomePath == null) {
-        String m2Home = System.getProperty("maven.home");
-        if (m2Home == null) {
-          m2Home = System.getenv("M2_HOME");
-        }
-        if (m2Home == null) {
-          globalSettingsFile = null;
+      if (globalSettingsPath == null) {
+        if (mavenConfPath == null) {
+          if (mavenHomePath == null) {
+            String m2Home = System.getProperty("maven.home");
+            if (m2Home == null) {
+              m2Home = System.getenv("M2_HOME");
+            }
+            if (m2Home == null) {
+              globalSettingsFile = null;
+            } else {
+              mavenHomePath = Paths.get(m2Home);
+              mavenConfPath = mavenHomePath.resolve("conf");
+              globalSettingsPath = mavenConfPath.resolve("settings.xml");
+              globalSettingsFile = globalSettingsPath.toFile();
+            }
+          } else {
+            mavenConfPath = mavenHomePath.resolve("conf");
+            assert mavenConfPath != null;
+            globalSettingsPath = mavenConfPath.resolve("settings.xml");
+            globalSettingsFile = globalSettingsPath.toFile();
+          }
         } else {
-          globalSettingsFile = Paths.get(m2Home, "conf", "settings.xml").toFile();
+          globalSettingsPath = mavenConfPath.resolve("settings.xml");
+          globalSettingsFile = globalSettingsPath.toFile();
         }
       } else {
-        globalSettingsFile = mavenHomePath.resolve(Paths.get("conf", "settings.xml")).toFile();
+        globalSettingsFile = globalSettingsPath.toFile();
       }
       request.setGlobalSettingsFile(globalSettingsFile);
 

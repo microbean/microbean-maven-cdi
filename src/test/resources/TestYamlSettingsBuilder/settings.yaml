@@ -1,0 +1,12 @@
+localRepository: fred
+servers:
+  - id: server1
+    configuration:
+      - frobs:
+          - frob:
+              name: hoopy
+              value: frood
+          - frob:
+              name: b
+              value: bork
+
