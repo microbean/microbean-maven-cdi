@@ -147,6 +147,8 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.io.DefaultSettingsReader;
 import org.apache.maven.settings.io.DefaultSettingsWriter;
 
+import org.apache.maven.settings.merge.MavenSettingsMerger;
+
 import org.apache.maven.settings.validation.DefaultSettingsValidator;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -401,7 +403,7 @@ public class MavenExtension implements Extension {
       event.addAnnotatedType(DefaultSettingsWriter.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(FileTransporterFactory.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(HttpTransporterFactory.class, "maven").add(SingletonLiteral.INSTANCE);
-
+      event.addAnnotatedType(MavenSettingsMerger.class, "maven").add(SingletonLiteral.INSTANCE);
     }
   }
 
