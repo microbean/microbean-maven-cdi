@@ -8,12 +8,13 @@
   <parent>
     <groupId>org.microbean</groupId>
     <artifactId>microbean-pluginmanagement-pom</artifactId>
-    <version>5</version>
+    <version>10</version>
+    <relativePath/>
   </parent>
 
   <name>microBean Maven CDI</name>
   <description>${project.name}</description>
-  <url>http://microbean.github.io/${project.artifactId}</url>  
+  <url>http://microbean.github.io/${project.artifactId}</url>
 
   <scm>
     <connection>scm:git:git@github.com:microbean/${project.artifactId}.git</connection>
@@ -28,11 +29,11 @@
 
       <!-- Imports. -->
 
-      
+
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-base-specification</artifactId>
-        <version>0.4.2</version>
+        <version>0.4.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -40,7 +41,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-weld-se-environment</artifactId>
-        <version>0.4.2</version>
+        <version>0.5.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -48,90 +49,83 @@
 
       <!-- Normal dependencies. -->
 
-      
+
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
-        <version>3.5.3</version>
+        <version>3.6.0</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-resolver-provider</artifactId>
-        <version>3.5.3</version>
+        <version>3.6.0</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
-        <version>3.5.3</version>
+        <version>3.6.0</version>
         <type>jar</type>
       </dependency>
-      
+
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings-builder</artifactId>
-        <version>3.5.3</version>
+        <version>3.6.0</version>
         <type>jar</type>
       </dependency>
-      
+
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-api</artifactId>
-        <version>1.1.1</version>
+        <version>1.3.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-connector-basic</artifactId>
-        <version>1.1.1</version>
+        <version>1.3.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-transport-file</artifactId>
-        <version>1.1.1</version>
+        <version>1.3.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-transport-http</artifactId>
-        <version>1.1.1</version>
+        <version>1.3.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-util</artifactId>
-        <version>1.1.1</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.7.25</version>
+        <version>1.3.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
-        <version>1.20</version>
+        <version>1.24</version>
         <type>jar</type>
       </dependency>
-      
+
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
 
-    
+
     <!-- Test-scoped dependencies. -->
 
 
@@ -145,91 +139,12 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <type>jar</type>
       <scope>test</scope>
     </dependency>
-    
-    <!-- Compile-scoped dependencies. -->
 
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model-builder</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
 
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-resolver-provider</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings-builder</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-api</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-connector-basic</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-file</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-http</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-util</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <type>jar</type>
-      <scope>compile</scope> <!-- really? -->
-    </dependency>
-
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-
-    
     <!-- Provided-scoped dependencies. -->
+
 
     <dependency>
       <groupId>org.microbean</groupId>
@@ -238,33 +153,77 @@
       <scope>provided</scope>
     </dependency>
 
+
+    <!-- Compile-scoped dependencies. -->
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model-builder</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-resolver-provider</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-settings</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-settings-builder</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-connector-basic</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-transport-file</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-transport-http</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-util</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
-    <resources>
 
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-      
-      <resource>
-        <targetPath>META-INF</targetPath>
-        <directory />
-        <includes>
-          <include>LICENSE</include>
-        </includes>
-      </resource>
-
-    </resources>
     <pluginManagement>
       <plugins>
 
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>findbugs-maven-plugin</artifactId>
-          <version>3.0.4</version>
-        </plugin>
-        
         <plugin>
           <groupId>org.jboss.jandex</groupId>
           <artifactId>jandex-maven-plugin</artifactId>
@@ -274,7 +233,7 @@
       </plugins>
     </pluginManagement>
     <plugins>
-      
+
       <plugin>
         <groupId>org.jboss.jandex</groupId>
         <artifactId>jandex-maven-plugin</artifactId>
@@ -287,7 +246,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
@@ -308,36 +267,32 @@
 
   <properties>
 
-    <!-- findbugs-maven-plugin properties; see http://gleclaire.github.io/findbugs-maven-plugin/findbugs-mojo.html -->
-    <findbugs.effort>Max</findbugs.effort>
-    <findbugs.excludeFilterFile>src/findbugs/exclude.xml</findbugs.excludeFilterFile>
-    <findbugs.threshold>Medium</findbugs.threshold>
-
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <doctitle>&lt;a href="${project.url}" target="_parent"&gt;&lt;span style="font-family:Lobster, cursive;"&gt;µb&lt;/span&gt; ${project.artifactId}&lt;/a&gt; ${project.version} &lt;a href="https://travis-ci.org/microbean/${project.artifactId}" target="_parent"&gt;&lt;img src="https://travis-ci.org/microbean/${project.artifactId}.svg?branch=master"&gt;&lt;/a&gt;</doctitle>
-    <links>https://www.slf4j.org/api/,http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.5.3/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/,http://codehaus-plexus.github.io/plexus-utils/apidocs/</links>
+    <links>http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.6.0/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/,http://codehaus-plexus.github.io/plexus-utils/apidocs/</links>
     <stylesheetfile>css/stylesheet.css</stylesheetfile>
 
-    <!-- maven-release-plugin properties -->
-    <goals>deploy,site-deploy</goals>
-    <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
-    
+    <ciUrl>https://travis-ci.org/microbean/${project.artifactId}</ciUrl>
+
     <!-- Weld logging; see https://docs.jboss.org/weld/reference/latest/en-US/html/logging.html#_weld_se -->
     <org.jboss.logging.provider>slf4j</org.jboss.logging.provider>
     <org.slf4j.simpleLogger.log.org.jboss.weld>info</org.slf4j.simpleLogger.log.org.jboss.weld>
-    
+
   </properties>
-  
+
   <reporting>
     <plugins>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>javadoc-no-fork</report>
+              <report>test-javadoc-no-fork</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
     </plugins>
   </reporting>
-  
+
 </project>

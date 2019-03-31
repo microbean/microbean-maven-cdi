@@ -364,7 +364,6 @@ public class YamlSettingsBuilder implements SettingsBuilder {
         try {
           value = interpolator.interpolate(value, "settings");
         } catch (final InterpolationException interpolationException) {
-          assert problemCollector != null;
           problemCollector.add(SettingsProblem.Severity.ERROR,
                                "Failed to interpolate settings: " +
                                interpolationException.getMessage(),
@@ -575,12 +574,11 @@ public class YamlSettingsBuilder implements SettingsBuilder {
     }
     
     @Override
-    protected final Object constructScalar(final ScalarNode node) {
-      Object returnValue = super.constructScalar(node);
-      if (this.interpolator != null && returnValue instanceof String) {
-        final String value = (String)returnValue;
+    protected final String constructScalar(final ScalarNode node) {
+      String returnValue = super.constructScalar(node);
+      if (this.interpolator != null && returnValue != null) {
         try {
-          returnValue = this.interpolator.interpolate(value, "settings");
+          returnValue = this.interpolator.interpolate(returnValue, "settings");
         } catch (final InterpolationException interpolationException) {
           assert this.problemCollector != null;
           this.problemCollector.add(SettingsProblem.Severity.ERROR,

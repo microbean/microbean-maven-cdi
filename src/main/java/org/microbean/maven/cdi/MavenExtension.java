@@ -174,7 +174,6 @@ import org.eclipse.aether.impl.MetadataGeneratorFactory;
 
 import org.eclipse.aether.internal.impl.DefaultArtifactResolver;
 import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
-import org.eclipse.aether.internal.impl.DefaultDependencyCollector;
 import org.eclipse.aether.internal.impl.DefaultDeployer;
 import org.eclipse.aether.internal.impl.DefaultFileProcessor;
 import org.eclipse.aether.internal.impl.DefaultInstaller;
@@ -193,6 +192,8 @@ import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory;
 import org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+
+import org.eclipse.aether.internal.impl.collect.DefaultDependencyCollector;
 
 import org.eclipse.aether.internal.impl.slf4j.Slf4jLoggerFactory;
 
@@ -611,7 +612,7 @@ public class MavenExtension implements Extension {
                 if (root != null) {
                   root = root.getParentFile();
                 }
-              } else if (root != null) {
+              } else {
                 root = root.getParentFile();
               }
             }
