@@ -60,10 +60,10 @@ With microBean Maven CDI, you simply do this:
 
     @Inject
     private RepositorySystem repositorySystem;
-    
+
     @Inject
     private RepositorySystemSession repositorySystemSession;
-    
+
 &hellip;and the [`MavenExtension` portable extension][14] takes care
 of setting up the dozens of supporting objects for you behind the
 scenes.
@@ -77,7 +77,7 @@ consideration:
     @Inject
     @Resolution // for dependency resolution, as opposed to, say, deployment
     private List<RemoteRepository> remoteRepositories;
-    
+
 ## Usage
 
 Here is some pseudocode showing how you might go about resolving the
@@ -106,14 +106,14 @@ CDI bean:
 
     @Inject
     private RepositorySystem repositorySystem;
-    
+
     @Inject
     private RepositorySystemSession session;
-    
+
     @Inject
     @Resolution
     private List<RemoteRepository> remoteRepositories;
-    
+
     public void resolve() throws DependencyResolutionException {
       final CollectRequest collectRequest = new CollectRequest();
       final Artifact artifact = new DefaultArtifact("org.slf4j", "slf4j-api", "jar", "1.7.24");
@@ -128,12 +128,12 @@ CDI bean:
 
 [1]: http://maven.apache.org/
 [2]: http://maven.apache.org/resolver
-[3]: http://search.maven.org/#artifactdetails%7Corg.apache.maven.shared%7Cmaven-artifact-resolver%7C1.0%7Cjar 
+[3]: http://search.maven.org/#artifactdetails%7Corg.apache.maven.shared%7Cmaven-artifact-resolver%7C1.0%7Cjar
 [4]: https://www.sonatype.com/
 [5]: https://github.com/sonatype/sonatype-aether
 [6]: http://blog.sonatype.com/2010/08/introducing-aether/
 [7]: https://projects.eclipse.org/projects/technology.aether
-[8]: http://search.maven.org/#artifactdetails%7Corg.apache.maven.resolver%7Cmaven-resolver%7C1.0.3%7Cpom
+[8]: http://search.maven.org/#artifactdetails%7Corg.apache.maven.resolver%7Cmaven-resolver%7C1.3.3%7Cpom
 [9]: https://github.com/google/guice/wiki/GettingStarted
 [10]: https://github.com/google/guice/
 [11]: https://codehaus-plexus.github.io/plexus-components/
