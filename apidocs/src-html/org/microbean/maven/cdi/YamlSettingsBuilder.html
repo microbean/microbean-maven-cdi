@@ -8,7 +8,7 @@
 <div class="sourceContainer">
 <pre><span class="sourceLineNo">001</span>/* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-<a name="line.1"></a>
 <span class="sourceLineNo">002</span> *<a name="line.2"></a>
-<span class="sourceLineNo">003</span> * Copyright © 2017-2018 microBean.<a name="line.3"></a>
+<span class="sourceLineNo">003</span> * Copyright © 2017-2019 microBean.<a name="line.3"></a>
 <span class="sourceLineNo">004</span> *<a name="line.4"></a>
 <span class="sourceLineNo">005</span> * Licensed under the Apache License, Version 2.0 (the "License");<a name="line.5"></a>
 <span class="sourceLineNo">006</span> * you may not use this file except in compliance with the License.<a name="line.6"></a>
@@ -372,251 +372,249 @@
 <span class="sourceLineNo">364</span>        try {<a name="line.364"></a>
 <span class="sourceLineNo">365</span>          value = interpolator.interpolate(value, "settings");<a name="line.365"></a>
 <span class="sourceLineNo">366</span>        } catch (final InterpolationException interpolationException) {<a name="line.366"></a>
-<span class="sourceLineNo">367</span>          assert problemCollector != null;<a name="line.367"></a>
-<span class="sourceLineNo">368</span>          problemCollector.add(SettingsProblem.Severity.ERROR,<a name="line.368"></a>
-<span class="sourceLineNo">369</span>                               "Failed to interpolate settings: " +<a name="line.369"></a>
-<span class="sourceLineNo">370</span>                               interpolationException.getMessage(),<a name="line.370"></a>
+<span class="sourceLineNo">367</span>          problemCollector.add(SettingsProblem.Severity.ERROR,<a name="line.367"></a>
+<span class="sourceLineNo">368</span>                               "Failed to interpolate settings: " +<a name="line.368"></a>
+<span class="sourceLineNo">369</span>                               interpolationException.getMessage(),<a name="line.369"></a>
+<span class="sourceLineNo">370</span>                               -1,<a name="line.370"></a>
 <span class="sourceLineNo">371</span>                               -1,<a name="line.371"></a>
-<span class="sourceLineNo">372</span>                               -1,<a name="line.372"></a>
-<span class="sourceLineNo">373</span>                               interpolationException);<a name="line.373"></a>
-<span class="sourceLineNo">374</span>        }<a name="line.374"></a>
-<span class="sourceLineNo">375</span>      }<a name="line.375"></a>
-<span class="sourceLineNo">376</span>      element.setValue(value);<a name="line.376"></a>
-<span class="sourceLineNo">377</span>    }<a name="line.377"></a>
-<span class="sourceLineNo">378</span>  }<a name="line.378"></a>
-<span class="sourceLineNo">379</span>    <a name="line.379"></a>
-<span class="sourceLineNo">380</span>  private static final void handleConfigurationCollection(final Interpolator interpolator,<a name="line.380"></a>
-<span class="sourceLineNo">381</span>                                                          final SettingsProblemCollector problemCollector,<a name="line.381"></a>
-<span class="sourceLineNo">382</span>                                                          final Xpp3Dom rootElement,<a name="line.382"></a>
-<span class="sourceLineNo">383</span>                                                          final Collection&lt;?&gt; items) {<a name="line.383"></a>
-<span class="sourceLineNo">384</span>    Objects.requireNonNull(rootElement);<a name="line.384"></a>
-<span class="sourceLineNo">385</span>    if (items != null &amp;&amp; !items.isEmpty()) {<a name="line.385"></a>
-<span class="sourceLineNo">386</span>      for (final Object item : items) {<a name="line.386"></a>
-<span class="sourceLineNo">387</span>        if (item instanceof Map) {<a name="line.387"></a>
-<span class="sourceLineNo">388</span>          handleConfigurationMap(interpolator, problemCollector, rootElement, (Map&lt;?, ?&gt;)item);<a name="line.388"></a>
-<span class="sourceLineNo">389</span>        } else if (item instanceof Collection) {<a name="line.389"></a>
-<span class="sourceLineNo">390</span>          throw new YAMLException("Invalid configuration element (after deserialization): " + item);<a name="line.390"></a>
-<span class="sourceLineNo">391</span>        } else {<a name="line.391"></a>
-<span class="sourceLineNo">392</span>          handleConfigurationScalar(interpolator, problemCollector, rootElement, item);<a name="line.392"></a>
-<span class="sourceLineNo">393</span>        }<a name="line.393"></a>
-<span class="sourceLineNo">394</span>      }<a name="line.394"></a>
-<span class="sourceLineNo">395</span>    }<a name="line.395"></a>
-<span class="sourceLineNo">396</span>  }<a name="line.396"></a>
-<span class="sourceLineNo">397</span><a name="line.397"></a>
-<span class="sourceLineNo">398</span>  private static final void handleConfigurationMap(final Interpolator interpolator,<a name="line.398"></a>
-<span class="sourceLineNo">399</span>                                                   final SettingsProblemCollector problemCollector,<a name="line.399"></a>
-<span class="sourceLineNo">400</span>                                                   final Xpp3Dom rootElement,<a name="line.400"></a>
-<span class="sourceLineNo">401</span>                                                   final Map&lt;?, ?&gt; items) {<a name="line.401"></a>
-<span class="sourceLineNo">402</span>    Objects.requireNonNull(rootElement);<a name="line.402"></a>
-<span class="sourceLineNo">403</span>    if (items != null &amp;&amp; !items.isEmpty()) {<a name="line.403"></a>
-<span class="sourceLineNo">404</span>      final Set&lt;? extends Entry&lt;?, ?&gt;&gt; entrySet = items.entrySet();<a name="line.404"></a>
-<span class="sourceLineNo">405</span>      if (entrySet != null &amp;&amp; !entrySet.isEmpty()) {<a name="line.405"></a>
-<span class="sourceLineNo">406</span>        for (final Entry&lt;?, ?&gt; entry : entrySet) {<a name="line.406"></a>
-<span class="sourceLineNo">407</span>          if (entry != null) {<a name="line.407"></a>
-<span class="sourceLineNo">408</span>            final Object key = entry.getKey();<a name="line.408"></a>
-<span class="sourceLineNo">409</span>            final Xpp3Dom element = new Xpp3Dom(String.valueOf(key));<a name="line.409"></a>
-<span class="sourceLineNo">410</span>            element.setParent(rootElement);<a name="line.410"></a>
-<span class="sourceLineNo">411</span>            rootElement.addChild(element);<a name="line.411"></a>
-<span class="sourceLineNo">412</span>            final Object value = entry.getValue();<a name="line.412"></a>
-<span class="sourceLineNo">413</span>            if (value != null) {<a name="line.413"></a>
-<span class="sourceLineNo">414</span>              if (value instanceof Collection) {<a name="line.414"></a>
-<span class="sourceLineNo">415</span>                handleConfigurationCollection(interpolator, problemCollector, element, (Collection&lt;?&gt;)value);<a name="line.415"></a>
-<span class="sourceLineNo">416</span>              } else if (value instanceof Map) {<a name="line.416"></a>
-<span class="sourceLineNo">417</span>                handleConfigurationMap(interpolator, problemCollector, element, (Map&lt;?, ?&gt;)value); // RECURSIVE<a name="line.417"></a>
-<span class="sourceLineNo">418</span>              } else {<a name="line.418"></a>
-<span class="sourceLineNo">419</span>                handleConfigurationScalar(interpolator, problemCollector, element, value);<a name="line.419"></a>
-<span class="sourceLineNo">420</span>              }<a name="line.420"></a>
-<span class="sourceLineNo">421</span>            }<a name="line.421"></a>
-<span class="sourceLineNo">422</span>          }<a name="line.422"></a>
-<span class="sourceLineNo">423</span>        }<a name="line.423"></a>
-<span class="sourceLineNo">424</span>      }<a name="line.424"></a>
-<span class="sourceLineNo">425</span>    }<a name="line.425"></a>
-<span class="sourceLineNo">426</span>  }<a name="line.426"></a>
-<span class="sourceLineNo">427</span><a name="line.427"></a>
-<span class="sourceLineNo">428</span>  private final Settings readSettings(final Source source,<a name="line.428"></a>
-<span class="sourceLineNo">429</span>                                      final SettingsBuildingRequest request,<a name="line.429"></a>
-<span class="sourceLineNo">430</span>                                      final Collection&lt;SettingsProblem&gt; problems) {<a name="line.430"></a>
-<span class="sourceLineNo">431</span>    Objects.requireNonNull(problems);<a name="line.431"></a>
-<span class="sourceLineNo">432</span>    Settings returnValue = null;<a name="line.432"></a>
-<span class="sourceLineNo">433</span>    if (source != null) {<a name="line.433"></a>
-<span class="sourceLineNo">434</span>      SettingsProblemCollector collector =<a name="line.434"></a>
-<span class="sourceLineNo">435</span>        (severity, message, line, column, cause) -&gt;<a name="line.435"></a>
-<span class="sourceLineNo">436</span>        add(problems, severity, message, source.getLocation(), line, column, cause);<a name="line.436"></a>
-<span class="sourceLineNo">437</span>      final Interpolator interpolator = new RegexBasedInterpolator();<a name="line.437"></a>
-<span class="sourceLineNo">438</span>      interpolator.addValueSource(new PropertiesBasedValueSource(request.getUserProperties()));<a name="line.438"></a>
-<span class="sourceLineNo">439</span>      interpolator.addValueSource(new PropertiesBasedValueSource(request.getSystemProperties()));<a name="line.439"></a>
-<span class="sourceLineNo">440</span>      try {<a name="line.440"></a>
-<span class="sourceLineNo">441</span>        interpolator.addValueSource(new EnvarBasedValueSource());<a name="line.441"></a>
-<span class="sourceLineNo">442</span>      } catch (final IOException ioException) {<a name="line.442"></a>
-<span class="sourceLineNo">443</span>        collector.add(SettingsProblem.Severity.WARNING,<a name="line.443"></a>
-<span class="sourceLineNo">444</span>                      "Failed to use environment variables for interpolation: " +<a name="line.444"></a>
-<span class="sourceLineNo">445</span>                      ioException.getMessage(),<a name="line.445"></a>
+<span class="sourceLineNo">372</span>                               interpolationException);<a name="line.372"></a>
+<span class="sourceLineNo">373</span>        }<a name="line.373"></a>
+<span class="sourceLineNo">374</span>      }<a name="line.374"></a>
+<span class="sourceLineNo">375</span>      element.setValue(value);<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    }<a name="line.376"></a>
+<span class="sourceLineNo">377</span>  }<a name="line.377"></a>
+<span class="sourceLineNo">378</span>    <a name="line.378"></a>
+<span class="sourceLineNo">379</span>  private static final void handleConfigurationCollection(final Interpolator interpolator,<a name="line.379"></a>
+<span class="sourceLineNo">380</span>                                                          final SettingsProblemCollector problemCollector,<a name="line.380"></a>
+<span class="sourceLineNo">381</span>                                                          final Xpp3Dom rootElement,<a name="line.381"></a>
+<span class="sourceLineNo">382</span>                                                          final Collection&lt;?&gt; items) {<a name="line.382"></a>
+<span class="sourceLineNo">383</span>    Objects.requireNonNull(rootElement);<a name="line.383"></a>
+<span class="sourceLineNo">384</span>    if (items != null &amp;&amp; !items.isEmpty()) {<a name="line.384"></a>
+<span class="sourceLineNo">385</span>      for (final Object item : items) {<a name="line.385"></a>
+<span class="sourceLineNo">386</span>        if (item instanceof Map) {<a name="line.386"></a>
+<span class="sourceLineNo">387</span>          handleConfigurationMap(interpolator, problemCollector, rootElement, (Map&lt;?, ?&gt;)item);<a name="line.387"></a>
+<span class="sourceLineNo">388</span>        } else if (item instanceof Collection) {<a name="line.388"></a>
+<span class="sourceLineNo">389</span>          throw new YAMLException("Invalid configuration element (after deserialization): " + item);<a name="line.389"></a>
+<span class="sourceLineNo">390</span>        } else {<a name="line.390"></a>
+<span class="sourceLineNo">391</span>          handleConfigurationScalar(interpolator, problemCollector, rootElement, item);<a name="line.391"></a>
+<span class="sourceLineNo">392</span>        }<a name="line.392"></a>
+<span class="sourceLineNo">393</span>      }<a name="line.393"></a>
+<span class="sourceLineNo">394</span>    }<a name="line.394"></a>
+<span class="sourceLineNo">395</span>  }<a name="line.395"></a>
+<span class="sourceLineNo">396</span><a name="line.396"></a>
+<span class="sourceLineNo">397</span>  private static final void handleConfigurationMap(final Interpolator interpolator,<a name="line.397"></a>
+<span class="sourceLineNo">398</span>                                                   final SettingsProblemCollector problemCollector,<a name="line.398"></a>
+<span class="sourceLineNo">399</span>                                                   final Xpp3Dom rootElement,<a name="line.399"></a>
+<span class="sourceLineNo">400</span>                                                   final Map&lt;?, ?&gt; items) {<a name="line.400"></a>
+<span class="sourceLineNo">401</span>    Objects.requireNonNull(rootElement);<a name="line.401"></a>
+<span class="sourceLineNo">402</span>    if (items != null &amp;&amp; !items.isEmpty()) {<a name="line.402"></a>
+<span class="sourceLineNo">403</span>      final Set&lt;? extends Entry&lt;?, ?&gt;&gt; entrySet = items.entrySet();<a name="line.403"></a>
+<span class="sourceLineNo">404</span>      if (entrySet != null &amp;&amp; !entrySet.isEmpty()) {<a name="line.404"></a>
+<span class="sourceLineNo">405</span>        for (final Entry&lt;?, ?&gt; entry : entrySet) {<a name="line.405"></a>
+<span class="sourceLineNo">406</span>          if (entry != null) {<a name="line.406"></a>
+<span class="sourceLineNo">407</span>            final Object key = entry.getKey();<a name="line.407"></a>
+<span class="sourceLineNo">408</span>            final Xpp3Dom element = new Xpp3Dom(String.valueOf(key));<a name="line.408"></a>
+<span class="sourceLineNo">409</span>            element.setParent(rootElement);<a name="line.409"></a>
+<span class="sourceLineNo">410</span>            rootElement.addChild(element);<a name="line.410"></a>
+<span class="sourceLineNo">411</span>            final Object value = entry.getValue();<a name="line.411"></a>
+<span class="sourceLineNo">412</span>            if (value != null) {<a name="line.412"></a>
+<span class="sourceLineNo">413</span>              if (value instanceof Collection) {<a name="line.413"></a>
+<span class="sourceLineNo">414</span>                handleConfigurationCollection(interpolator, problemCollector, element, (Collection&lt;?&gt;)value);<a name="line.414"></a>
+<span class="sourceLineNo">415</span>              } else if (value instanceof Map) {<a name="line.415"></a>
+<span class="sourceLineNo">416</span>                handleConfigurationMap(interpolator, problemCollector, element, (Map&lt;?, ?&gt;)value); // RECURSIVE<a name="line.416"></a>
+<span class="sourceLineNo">417</span>              } else {<a name="line.417"></a>
+<span class="sourceLineNo">418</span>                handleConfigurationScalar(interpolator, problemCollector, element, value);<a name="line.418"></a>
+<span class="sourceLineNo">419</span>              }<a name="line.419"></a>
+<span class="sourceLineNo">420</span>            }<a name="line.420"></a>
+<span class="sourceLineNo">421</span>          }<a name="line.421"></a>
+<span class="sourceLineNo">422</span>        }<a name="line.422"></a>
+<span class="sourceLineNo">423</span>      }<a name="line.423"></a>
+<span class="sourceLineNo">424</span>    }<a name="line.424"></a>
+<span class="sourceLineNo">425</span>  }<a name="line.425"></a>
+<span class="sourceLineNo">426</span><a name="line.426"></a>
+<span class="sourceLineNo">427</span>  private final Settings readSettings(final Source source,<a name="line.427"></a>
+<span class="sourceLineNo">428</span>                                      final SettingsBuildingRequest request,<a name="line.428"></a>
+<span class="sourceLineNo">429</span>                                      final Collection&lt;SettingsProblem&gt; problems) {<a name="line.429"></a>
+<span class="sourceLineNo">430</span>    Objects.requireNonNull(problems);<a name="line.430"></a>
+<span class="sourceLineNo">431</span>    Settings returnValue = null;<a name="line.431"></a>
+<span class="sourceLineNo">432</span>    if (source != null) {<a name="line.432"></a>
+<span class="sourceLineNo">433</span>      SettingsProblemCollector collector =<a name="line.433"></a>
+<span class="sourceLineNo">434</span>        (severity, message, line, column, cause) -&gt;<a name="line.434"></a>
+<span class="sourceLineNo">435</span>        add(problems, severity, message, source.getLocation(), line, column, cause);<a name="line.435"></a>
+<span class="sourceLineNo">436</span>      final Interpolator interpolator = new RegexBasedInterpolator();<a name="line.436"></a>
+<span class="sourceLineNo">437</span>      interpolator.addValueSource(new PropertiesBasedValueSource(request.getUserProperties()));<a name="line.437"></a>
+<span class="sourceLineNo">438</span>      interpolator.addValueSource(new PropertiesBasedValueSource(request.getSystemProperties()));<a name="line.438"></a>
+<span class="sourceLineNo">439</span>      try {<a name="line.439"></a>
+<span class="sourceLineNo">440</span>        interpolator.addValueSource(new EnvarBasedValueSource());<a name="line.440"></a>
+<span class="sourceLineNo">441</span>      } catch (final IOException ioException) {<a name="line.441"></a>
+<span class="sourceLineNo">442</span>        collector.add(SettingsProblem.Severity.WARNING,<a name="line.442"></a>
+<span class="sourceLineNo">443</span>                      "Failed to use environment variables for interpolation: " +<a name="line.443"></a>
+<span class="sourceLineNo">444</span>                      ioException.getMessage(),<a name="line.444"></a>
+<span class="sourceLineNo">445</span>                      -1,<a name="line.445"></a>
 <span class="sourceLineNo">446</span>                      -1,<a name="line.446"></a>
-<span class="sourceLineNo">447</span>                      -1,<a name="line.447"></a>
-<span class="sourceLineNo">448</span>                      ioException);<a name="line.448"></a>
-<span class="sourceLineNo">449</span>      }<a name="line.449"></a>
-<span class="sourceLineNo">450</span>      try {<a name="line.450"></a>
-<span class="sourceLineNo">451</span>        try {<a name="line.451"></a>
-<span class="sourceLineNo">452</span>          returnValue = this.read(source, true, interpolator, collector);<a name="line.452"></a>
-<span class="sourceLineNo">453</span>          this.settingsValidator.validate(returnValue, collector);<a name="line.453"></a>
-<span class="sourceLineNo">454</span>        } catch (final SettingsParseException strictParsingFailed) {<a name="line.454"></a>
-<span class="sourceLineNo">455</span>          returnValue = this.read(source, false, interpolator, collector);<a name="line.455"></a>
-<span class="sourceLineNo">456</span>          // Record the warning only if lenient reading succeeded.<a name="line.456"></a>
-<span class="sourceLineNo">457</span>          collector.add(SettingsProblem.Severity.WARNING,<a name="line.457"></a>
-<span class="sourceLineNo">458</span>                        strictParsingFailed.getMessage(),<a name="line.458"></a>
-<span class="sourceLineNo">459</span>                        strictParsingFailed.getLineNumber(),<a name="line.459"></a>
-<span class="sourceLineNo">460</span>                        strictParsingFailed.getColumnNumber(),<a name="line.460"></a>
-<span class="sourceLineNo">461</span>                        strictParsingFailed);<a name="line.461"></a>
-<span class="sourceLineNo">462</span>          this.settingsValidator.validate(returnValue, collector);<a name="line.462"></a>
-<span class="sourceLineNo">463</span>        }<a name="line.463"></a>
-<span class="sourceLineNo">464</span>      } catch (final SettingsParseException lenientParsingFailed) {<a name="line.464"></a>
-<span class="sourceLineNo">465</span>        collector.add(SettingsProblem.Severity.FATAL,<a name="line.465"></a>
-<span class="sourceLineNo">466</span>                      "Non-parseable settings " +<a name="line.466"></a>
-<span class="sourceLineNo">467</span>                      source.getLocation() +<a name="line.467"></a>
-<span class="sourceLineNo">468</span>                      ": " +<a name="line.468"></a>
-<span class="sourceLineNo">469</span>                      lenientParsingFailed.getMessage(),<a name="line.469"></a>
-<span class="sourceLineNo">470</span>                      lenientParsingFailed.getLineNumber(),<a name="line.470"></a>
-<span class="sourceLineNo">471</span>                      lenientParsingFailed.getColumnNumber(),<a name="line.471"></a>
-<span class="sourceLineNo">472</span>                      lenientParsingFailed);<a name="line.472"></a>
-<span class="sourceLineNo">473</span>      } catch (final IOException ioException) {<a name="line.473"></a>
-<span class="sourceLineNo">474</span>        collector.add(SettingsProblem.Severity.FATAL,<a name="line.474"></a>
-<span class="sourceLineNo">475</span>                      "Non-readable settings " +<a name="line.475"></a>
-<span class="sourceLineNo">476</span>                      source.getLocation() +<a name="line.476"></a>
-<span class="sourceLineNo">477</span>                      ": " +<a name="line.477"></a>
-<span class="sourceLineNo">478</span>                      ioException.getMessage(),<a name="line.478"></a>
+<span class="sourceLineNo">447</span>                      ioException);<a name="line.447"></a>
+<span class="sourceLineNo">448</span>      }<a name="line.448"></a>
+<span class="sourceLineNo">449</span>      try {<a name="line.449"></a>
+<span class="sourceLineNo">450</span>        try {<a name="line.450"></a>
+<span class="sourceLineNo">451</span>          returnValue = this.read(source, true, interpolator, collector);<a name="line.451"></a>
+<span class="sourceLineNo">452</span>          this.settingsValidator.validate(returnValue, collector);<a name="line.452"></a>
+<span class="sourceLineNo">453</span>        } catch (final SettingsParseException strictParsingFailed) {<a name="line.453"></a>
+<span class="sourceLineNo">454</span>          returnValue = this.read(source, false, interpolator, collector);<a name="line.454"></a>
+<span class="sourceLineNo">455</span>          // Record the warning only if lenient reading succeeded.<a name="line.455"></a>
+<span class="sourceLineNo">456</span>          collector.add(SettingsProblem.Severity.WARNING,<a name="line.456"></a>
+<span class="sourceLineNo">457</span>                        strictParsingFailed.getMessage(),<a name="line.457"></a>
+<span class="sourceLineNo">458</span>                        strictParsingFailed.getLineNumber(),<a name="line.458"></a>
+<span class="sourceLineNo">459</span>                        strictParsingFailed.getColumnNumber(),<a name="line.459"></a>
+<span class="sourceLineNo">460</span>                        strictParsingFailed);<a name="line.460"></a>
+<span class="sourceLineNo">461</span>          this.settingsValidator.validate(returnValue, collector);<a name="line.461"></a>
+<span class="sourceLineNo">462</span>        }<a name="line.462"></a>
+<span class="sourceLineNo">463</span>      } catch (final SettingsParseException lenientParsingFailed) {<a name="line.463"></a>
+<span class="sourceLineNo">464</span>        collector.add(SettingsProblem.Severity.FATAL,<a name="line.464"></a>
+<span class="sourceLineNo">465</span>                      "Non-parseable settings " +<a name="line.465"></a>
+<span class="sourceLineNo">466</span>                      source.getLocation() +<a name="line.466"></a>
+<span class="sourceLineNo">467</span>                      ": " +<a name="line.467"></a>
+<span class="sourceLineNo">468</span>                      lenientParsingFailed.getMessage(),<a name="line.468"></a>
+<span class="sourceLineNo">469</span>                      lenientParsingFailed.getLineNumber(),<a name="line.469"></a>
+<span class="sourceLineNo">470</span>                      lenientParsingFailed.getColumnNumber(),<a name="line.470"></a>
+<span class="sourceLineNo">471</span>                      lenientParsingFailed);<a name="line.471"></a>
+<span class="sourceLineNo">472</span>      } catch (final IOException ioException) {<a name="line.472"></a>
+<span class="sourceLineNo">473</span>        collector.add(SettingsProblem.Severity.FATAL,<a name="line.473"></a>
+<span class="sourceLineNo">474</span>                      "Non-readable settings " +<a name="line.474"></a>
+<span class="sourceLineNo">475</span>                      source.getLocation() +<a name="line.475"></a>
+<span class="sourceLineNo">476</span>                      ": " +<a name="line.476"></a>
+<span class="sourceLineNo">477</span>                      ioException.getMessage(),<a name="line.477"></a>
+<span class="sourceLineNo">478</span>                      -1,<a name="line.478"></a>
 <span class="sourceLineNo">479</span>                      -1,<a name="line.479"></a>
-<span class="sourceLineNo">480</span>                      -1,<a name="line.480"></a>
-<span class="sourceLineNo">481</span>                      ioException);<a name="line.481"></a>
-<span class="sourceLineNo">482</span>      }<a name="line.482"></a>
-<span class="sourceLineNo">483</span>    }<a name="line.483"></a>
-<span class="sourceLineNo">484</span>    return returnValue;<a name="line.484"></a>
-<span class="sourceLineNo">485</span>  }<a name="line.485"></a>
+<span class="sourceLineNo">480</span>                      ioException);<a name="line.480"></a>
+<span class="sourceLineNo">481</span>      }<a name="line.481"></a>
+<span class="sourceLineNo">482</span>    }<a name="line.482"></a>
+<span class="sourceLineNo">483</span>    return returnValue;<a name="line.483"></a>
+<span class="sourceLineNo">484</span>  }<a name="line.484"></a>
+<span class="sourceLineNo">485</span><a name="line.485"></a>
 <span class="sourceLineNo">486</span><a name="line.486"></a>
-<span class="sourceLineNo">487</span><a name="line.487"></a>
-<span class="sourceLineNo">488</span>  /*<a name="line.488"></a>
-<span class="sourceLineNo">489</span>   * Static methods.<a name="line.489"></a>
-<span class="sourceLineNo">490</span>   */<a name="line.490"></a>
-<span class="sourceLineNo">491</span><a name="line.491"></a>
-<span class="sourceLineNo">492</span>  <a name="line.492"></a>
-<span class="sourceLineNo">493</span>  private static final boolean hasErrors(Collection&lt;? extends SettingsProblem&gt; problems) {<a name="line.493"></a>
-<span class="sourceLineNo">494</span>    boolean returnValue = false;<a name="line.494"></a>
-<span class="sourceLineNo">495</span>    if (problems != null &amp;&amp; !problems.isEmpty()) {<a name="line.495"></a>
-<span class="sourceLineNo">496</span>      for (final SettingsProblem problem : problems) {<a name="line.496"></a>
-<span class="sourceLineNo">497</span>        if (problem != null &amp;&amp; SettingsProblem.Severity.ERROR.compareTo(problem.getSeverity()) &gt;= 0) {<a name="line.497"></a>
-<span class="sourceLineNo">498</span>          returnValue = true;<a name="line.498"></a>
-<span class="sourceLineNo">499</span>          break;<a name="line.499"></a>
-<span class="sourceLineNo">500</span>        }<a name="line.500"></a>
-<span class="sourceLineNo">501</span>      }<a name="line.501"></a>
-<span class="sourceLineNo">502</span>    }<a name="line.502"></a>
-<span class="sourceLineNo">503</span>    return returnValue;<a name="line.503"></a>
-<span class="sourceLineNo">504</span>  }<a name="line.504"></a>
-<span class="sourceLineNo">505</span>  <a name="line.505"></a>
-<span class="sourceLineNo">506</span>  private static final void add(final Collection&lt;SettingsProblem&gt; problems,<a name="line.506"></a>
-<span class="sourceLineNo">507</span>                                final SettingsProblem.Severity severity,<a name="line.507"></a>
-<span class="sourceLineNo">508</span>                                final String message,<a name="line.508"></a>
-<span class="sourceLineNo">509</span>                                final String source,<a name="line.509"></a>
-<span class="sourceLineNo">510</span>                                int line,<a name="line.510"></a>
-<span class="sourceLineNo">511</span>                                int column,<a name="line.511"></a>
-<span class="sourceLineNo">512</span>                                final Exception cause) {<a name="line.512"></a>
-<span class="sourceLineNo">513</span>    Objects.requireNonNull(problems);<a name="line.513"></a>
-<span class="sourceLineNo">514</span>    if (cause instanceof SettingsParseException &amp;&amp; line &lt;= 0 &amp;&amp; column &lt;= 0) {<a name="line.514"></a>
-<span class="sourceLineNo">515</span>      final SettingsParseException e = (SettingsParseException)cause;<a name="line.515"></a>
-<span class="sourceLineNo">516</span>      line = e.getLineNumber();<a name="line.516"></a>
-<span class="sourceLineNo">517</span>      column = e.getColumnNumber();<a name="line.517"></a>
-<span class="sourceLineNo">518</span>    }<a name="line.518"></a>
-<span class="sourceLineNo">519</span>    problems.add(new DefaultSettingsProblem(message, severity, source, line, column, cause));<a name="line.519"></a>
-<span class="sourceLineNo">520</span>  }<a name="line.520"></a>
+<span class="sourceLineNo">487</span>  /*<a name="line.487"></a>
+<span class="sourceLineNo">488</span>   * Static methods.<a name="line.488"></a>
+<span class="sourceLineNo">489</span>   */<a name="line.489"></a>
+<span class="sourceLineNo">490</span><a name="line.490"></a>
+<span class="sourceLineNo">491</span>  <a name="line.491"></a>
+<span class="sourceLineNo">492</span>  private static final boolean hasErrors(Collection&lt;? extends SettingsProblem&gt; problems) {<a name="line.492"></a>
+<span class="sourceLineNo">493</span>    boolean returnValue = false;<a name="line.493"></a>
+<span class="sourceLineNo">494</span>    if (problems != null &amp;&amp; !problems.isEmpty()) {<a name="line.494"></a>
+<span class="sourceLineNo">495</span>      for (final SettingsProblem problem : problems) {<a name="line.495"></a>
+<span class="sourceLineNo">496</span>        if (problem != null &amp;&amp; SettingsProblem.Severity.ERROR.compareTo(problem.getSeverity()) &gt;= 0) {<a name="line.496"></a>
+<span class="sourceLineNo">497</span>          returnValue = true;<a name="line.497"></a>
+<span class="sourceLineNo">498</span>          break;<a name="line.498"></a>
+<span class="sourceLineNo">499</span>        }<a name="line.499"></a>
+<span class="sourceLineNo">500</span>      }<a name="line.500"></a>
+<span class="sourceLineNo">501</span>    }<a name="line.501"></a>
+<span class="sourceLineNo">502</span>    return returnValue;<a name="line.502"></a>
+<span class="sourceLineNo">503</span>  }<a name="line.503"></a>
+<span class="sourceLineNo">504</span>  <a name="line.504"></a>
+<span class="sourceLineNo">505</span>  private static final void add(final Collection&lt;SettingsProblem&gt; problems,<a name="line.505"></a>
+<span class="sourceLineNo">506</span>                                final SettingsProblem.Severity severity,<a name="line.506"></a>
+<span class="sourceLineNo">507</span>                                final String message,<a name="line.507"></a>
+<span class="sourceLineNo">508</span>                                final String source,<a name="line.508"></a>
+<span class="sourceLineNo">509</span>                                int line,<a name="line.509"></a>
+<span class="sourceLineNo">510</span>                                int column,<a name="line.510"></a>
+<span class="sourceLineNo">511</span>                                final Exception cause) {<a name="line.511"></a>
+<span class="sourceLineNo">512</span>    Objects.requireNonNull(problems);<a name="line.512"></a>
+<span class="sourceLineNo">513</span>    if (cause instanceof SettingsParseException &amp;&amp; line &lt;= 0 &amp;&amp; column &lt;= 0) {<a name="line.513"></a>
+<span class="sourceLineNo">514</span>      final SettingsParseException e = (SettingsParseException)cause;<a name="line.514"></a>
+<span class="sourceLineNo">515</span>      line = e.getLineNumber();<a name="line.515"></a>
+<span class="sourceLineNo">516</span>      column = e.getColumnNumber();<a name="line.516"></a>
+<span class="sourceLineNo">517</span>    }<a name="line.517"></a>
+<span class="sourceLineNo">518</span>    problems.add(new DefaultSettingsProblem(message, severity, source, line, column, cause));<a name="line.518"></a>
+<span class="sourceLineNo">519</span>  }<a name="line.519"></a>
+<span class="sourceLineNo">520</span><a name="line.520"></a>
 <span class="sourceLineNo">521</span><a name="line.521"></a>
-<span class="sourceLineNo">522</span><a name="line.522"></a>
-<span class="sourceLineNo">523</span>  /*<a name="line.523"></a>
-<span class="sourceLineNo">524</span>   * Inner and nested calsses.<a name="line.524"></a>
-<span class="sourceLineNo">525</span>   */<a name="line.525"></a>
-<span class="sourceLineNo">526</span><a name="line.526"></a>
-<span class="sourceLineNo">527</span>  <a name="line.527"></a>
-<span class="sourceLineNo">528</span>  private static final class DefaultSettingsBuildingResult implements SettingsBuildingResult {<a name="line.528"></a>
-<span class="sourceLineNo">529</span><a name="line.529"></a>
-<span class="sourceLineNo">530</span>    private final Settings settings;<a name="line.530"></a>
-<span class="sourceLineNo">531</span><a name="line.531"></a>
-<span class="sourceLineNo">532</span>    private final List&lt;SettingsProblem&gt; problems;<a name="line.532"></a>
-<span class="sourceLineNo">533</span>    <a name="line.533"></a>
-<span class="sourceLineNo">534</span>    private DefaultSettingsBuildingResult(final Settings settings, final List&lt;SettingsProblem&gt; problems) {<a name="line.534"></a>
-<span class="sourceLineNo">535</span>      super();<a name="line.535"></a>
-<span class="sourceLineNo">536</span>      if (settings == null) {<a name="line.536"></a>
-<span class="sourceLineNo">537</span>        this.settings = new Settings();<a name="line.537"></a>
-<span class="sourceLineNo">538</span>      } else {<a name="line.538"></a>
-<span class="sourceLineNo">539</span>        this.settings = settings;<a name="line.539"></a>
-<span class="sourceLineNo">540</span>      }<a name="line.540"></a>
-<span class="sourceLineNo">541</span>      if (problems == null) {<a name="line.541"></a>
-<span class="sourceLineNo">542</span>        this.problems = Collections.emptyList();<a name="line.542"></a>
-<span class="sourceLineNo">543</span>      } else {<a name="line.543"></a>
-<span class="sourceLineNo">544</span>        this.problems = Collections.unmodifiableList(problems);<a name="line.544"></a>
-<span class="sourceLineNo">545</span>      }<a name="line.545"></a>
-<span class="sourceLineNo">546</span>    }<a name="line.546"></a>
-<span class="sourceLineNo">547</span><a name="line.547"></a>
-<span class="sourceLineNo">548</span>    @Override<a name="line.548"></a>
-<span class="sourceLineNo">549</span>    public final Settings getEffectiveSettings() {<a name="line.549"></a>
-<span class="sourceLineNo">550</span>      return this.settings;<a name="line.550"></a>
-<span class="sourceLineNo">551</span>    }<a name="line.551"></a>
-<span class="sourceLineNo">552</span><a name="line.552"></a>
-<span class="sourceLineNo">553</span>    @Override<a name="line.553"></a>
-<span class="sourceLineNo">554</span>    public final List&lt;SettingsProblem&gt; getProblems() {<a name="line.554"></a>
-<span class="sourceLineNo">555</span>      return this.problems;<a name="line.555"></a>
-<span class="sourceLineNo">556</span>    }<a name="line.556"></a>
-<span class="sourceLineNo">557</span>    <a name="line.557"></a>
-<span class="sourceLineNo">558</span>  }<a name="line.558"></a>
-<span class="sourceLineNo">559</span><a name="line.559"></a>
-<span class="sourceLineNo">560</span>  private static final class InterpolatingConstructor extends Constructor {<a name="line.560"></a>
-<span class="sourceLineNo">561</span><a name="line.561"></a>
-<span class="sourceLineNo">562</span>    private final Interpolator interpolator;<a name="line.562"></a>
-<span class="sourceLineNo">563</span><a name="line.563"></a>
-<span class="sourceLineNo">564</span>    private final SettingsProblemCollector problemCollector;<a name="line.564"></a>
-<span class="sourceLineNo">565</span>    <a name="line.565"></a>
-<span class="sourceLineNo">566</span>    private InterpolatingConstructor(final Interpolator interpolator,<a name="line.566"></a>
-<span class="sourceLineNo">567</span>                                     final SettingsProblemCollector problemCollector) {<a name="line.567"></a>
-<span class="sourceLineNo">568</span>      super(Settings.class);<a name="line.568"></a>
-<span class="sourceLineNo">569</span>      this.interpolator = interpolator;<a name="line.569"></a>
-<span class="sourceLineNo">570</span>      if (interpolator == null) {<a name="line.570"></a>
-<span class="sourceLineNo">571</span>        this.problemCollector = problemCollector;<a name="line.571"></a>
-<span class="sourceLineNo">572</span>      } else {<a name="line.572"></a>
-<span class="sourceLineNo">573</span>        this.problemCollector = Objects.requireNonNull(problemCollector);<a name="line.573"></a>
-<span class="sourceLineNo">574</span>      }<a name="line.574"></a>
-<span class="sourceLineNo">575</span>    }<a name="line.575"></a>
-<span class="sourceLineNo">576</span>    <a name="line.576"></a>
-<span class="sourceLineNo">577</span>    @Override<a name="line.577"></a>
-<span class="sourceLineNo">578</span>    protected final Object constructScalar(final ScalarNode node) {<a name="line.578"></a>
-<span class="sourceLineNo">579</span>      Object returnValue = super.constructScalar(node);<a name="line.579"></a>
-<span class="sourceLineNo">580</span>      if (this.interpolator != null &amp;&amp; returnValue instanceof String) {<a name="line.580"></a>
-<span class="sourceLineNo">581</span>        final String value = (String)returnValue;<a name="line.581"></a>
-<span class="sourceLineNo">582</span>        try {<a name="line.582"></a>
-<span class="sourceLineNo">583</span>          returnValue = this.interpolator.interpolate(value, "settings");<a name="line.583"></a>
-<span class="sourceLineNo">584</span>        } catch (final InterpolationException interpolationException) {<a name="line.584"></a>
-<span class="sourceLineNo">585</span>          assert this.problemCollector != null;<a name="line.585"></a>
-<span class="sourceLineNo">586</span>          this.problemCollector.add(SettingsProblem.Severity.ERROR,<a name="line.586"></a>
-<span class="sourceLineNo">587</span>                                    "Failed to interpolate settings: " +<a name="line.587"></a>
-<span class="sourceLineNo">588</span>                                    interpolationException.getMessage(),<a name="line.588"></a>
-<span class="sourceLineNo">589</span>                                    -1,<a name="line.589"></a>
-<span class="sourceLineNo">590</span>                                    -1,<a name="line.590"></a>
-<span class="sourceLineNo">591</span>                                    interpolationException);<a name="line.591"></a>
-<span class="sourceLineNo">592</span>        }<a name="line.592"></a>
-<span class="sourceLineNo">593</span>      }<a name="line.593"></a>
-<span class="sourceLineNo">594</span>      return returnValue;<a name="line.594"></a>
-<span class="sourceLineNo">595</span>    }<a name="line.595"></a>
+<span class="sourceLineNo">522</span>  /*<a name="line.522"></a>
+<span class="sourceLineNo">523</span>   * Inner and nested calsses.<a name="line.523"></a>
+<span class="sourceLineNo">524</span>   */<a name="line.524"></a>
+<span class="sourceLineNo">525</span><a name="line.525"></a>
+<span class="sourceLineNo">526</span>  <a name="line.526"></a>
+<span class="sourceLineNo">527</span>  private static final class DefaultSettingsBuildingResult implements SettingsBuildingResult {<a name="line.527"></a>
+<span class="sourceLineNo">528</span><a name="line.528"></a>
+<span class="sourceLineNo">529</span>    private final Settings settings;<a name="line.529"></a>
+<span class="sourceLineNo">530</span><a name="line.530"></a>
+<span class="sourceLineNo">531</span>    private final List&lt;SettingsProblem&gt; problems;<a name="line.531"></a>
+<span class="sourceLineNo">532</span>    <a name="line.532"></a>
+<span class="sourceLineNo">533</span>    private DefaultSettingsBuildingResult(final Settings settings, final List&lt;SettingsProblem&gt; problems) {<a name="line.533"></a>
+<span class="sourceLineNo">534</span>      super();<a name="line.534"></a>
+<span class="sourceLineNo">535</span>      if (settings == null) {<a name="line.535"></a>
+<span class="sourceLineNo">536</span>        this.settings = new Settings();<a name="line.536"></a>
+<span class="sourceLineNo">537</span>      } else {<a name="line.537"></a>
+<span class="sourceLineNo">538</span>        this.settings = settings;<a name="line.538"></a>
+<span class="sourceLineNo">539</span>      }<a name="line.539"></a>
+<span class="sourceLineNo">540</span>      if (problems == null) {<a name="line.540"></a>
+<span class="sourceLineNo">541</span>        this.problems = Collections.emptyList();<a name="line.541"></a>
+<span class="sourceLineNo">542</span>      } else {<a name="line.542"></a>
+<span class="sourceLineNo">543</span>        this.problems = Collections.unmodifiableList(problems);<a name="line.543"></a>
+<span class="sourceLineNo">544</span>      }<a name="line.544"></a>
+<span class="sourceLineNo">545</span>    }<a name="line.545"></a>
+<span class="sourceLineNo">546</span><a name="line.546"></a>
+<span class="sourceLineNo">547</span>    @Override<a name="line.547"></a>
+<span class="sourceLineNo">548</span>    public final Settings getEffectiveSettings() {<a name="line.548"></a>
+<span class="sourceLineNo">549</span>      return this.settings;<a name="line.549"></a>
+<span class="sourceLineNo">550</span>    }<a name="line.550"></a>
+<span class="sourceLineNo">551</span><a name="line.551"></a>
+<span class="sourceLineNo">552</span>    @Override<a name="line.552"></a>
+<span class="sourceLineNo">553</span>    public final List&lt;SettingsProblem&gt; getProblems() {<a name="line.553"></a>
+<span class="sourceLineNo">554</span>      return this.problems;<a name="line.554"></a>
+<span class="sourceLineNo">555</span>    }<a name="line.555"></a>
+<span class="sourceLineNo">556</span>    <a name="line.556"></a>
+<span class="sourceLineNo">557</span>  }<a name="line.557"></a>
+<span class="sourceLineNo">558</span><a name="line.558"></a>
+<span class="sourceLineNo">559</span>  private static final class InterpolatingConstructor extends Constructor {<a name="line.559"></a>
+<span class="sourceLineNo">560</span><a name="line.560"></a>
+<span class="sourceLineNo">561</span>    private final Interpolator interpolator;<a name="line.561"></a>
+<span class="sourceLineNo">562</span><a name="line.562"></a>
+<span class="sourceLineNo">563</span>    private final SettingsProblemCollector problemCollector;<a name="line.563"></a>
+<span class="sourceLineNo">564</span>    <a name="line.564"></a>
+<span class="sourceLineNo">565</span>    private InterpolatingConstructor(final Interpolator interpolator,<a name="line.565"></a>
+<span class="sourceLineNo">566</span>                                     final SettingsProblemCollector problemCollector) {<a name="line.566"></a>
+<span class="sourceLineNo">567</span>      super(Settings.class);<a name="line.567"></a>
+<span class="sourceLineNo">568</span>      this.interpolator = interpolator;<a name="line.568"></a>
+<span class="sourceLineNo">569</span>      if (interpolator == null) {<a name="line.569"></a>
+<span class="sourceLineNo">570</span>        this.problemCollector = problemCollector;<a name="line.570"></a>
+<span class="sourceLineNo">571</span>      } else {<a name="line.571"></a>
+<span class="sourceLineNo">572</span>        this.problemCollector = Objects.requireNonNull(problemCollector);<a name="line.572"></a>
+<span class="sourceLineNo">573</span>      }<a name="line.573"></a>
+<span class="sourceLineNo">574</span>    }<a name="line.574"></a>
+<span class="sourceLineNo">575</span>    <a name="line.575"></a>
+<span class="sourceLineNo">576</span>    @Override<a name="line.576"></a>
+<span class="sourceLineNo">577</span>    protected final String constructScalar(final ScalarNode node) {<a name="line.577"></a>
+<span class="sourceLineNo">578</span>      String returnValue = super.constructScalar(node);<a name="line.578"></a>
+<span class="sourceLineNo">579</span>      if (this.interpolator != null &amp;&amp; returnValue != null) {<a name="line.579"></a>
+<span class="sourceLineNo">580</span>        try {<a name="line.580"></a>
+<span class="sourceLineNo">581</span>          returnValue = this.interpolator.interpolate(returnValue, "settings");<a name="line.581"></a>
+<span class="sourceLineNo">582</span>        } catch (final InterpolationException interpolationException) {<a name="line.582"></a>
+<span class="sourceLineNo">583</span>          assert this.problemCollector != null;<a name="line.583"></a>
+<span class="sourceLineNo">584</span>          this.problemCollector.add(SettingsProblem.Severity.ERROR,<a name="line.584"></a>
+<span class="sourceLineNo">585</span>                                    "Failed to interpolate settings: " +<a name="line.585"></a>
+<span class="sourceLineNo">586</span>                                    interpolationException.getMessage(),<a name="line.586"></a>
+<span class="sourceLineNo">587</span>                                    -1,<a name="line.587"></a>
+<span class="sourceLineNo">588</span>                                    -1,<a name="line.588"></a>
+<span class="sourceLineNo">589</span>                                    interpolationException);<a name="line.589"></a>
+<span class="sourceLineNo">590</span>        }<a name="line.590"></a>
+<span class="sourceLineNo">591</span>      }<a name="line.591"></a>
+<span class="sourceLineNo">592</span>      return returnValue;<a name="line.592"></a>
+<span class="sourceLineNo">593</span>    }<a name="line.593"></a>
+<span class="sourceLineNo">594</span><a name="line.594"></a>
+<span class="sourceLineNo">595</span>  }<a name="line.595"></a>
 <span class="sourceLineNo">596</span><a name="line.596"></a>
-<span class="sourceLineNo">597</span>  }<a name="line.597"></a>
+<span class="sourceLineNo">597</span>  private static final class HackyConstructor extends SafeConstructor {<a name="line.597"></a>
 <span class="sourceLineNo">598</span><a name="line.598"></a>
-<span class="sourceLineNo">599</span>  private static final class HackyConstructor extends SafeConstructor {<a name="line.599"></a>
-<span class="sourceLineNo">600</span><a name="line.600"></a>
-<span class="sourceLineNo">601</span>    private HackyConstructor() {<a name="line.601"></a>
-<span class="sourceLineNo">602</span>      super();<a name="line.602"></a>
-<span class="sourceLineNo">603</span>    }<a name="line.603"></a>
-<span class="sourceLineNo">604</span><a name="line.604"></a>
-<span class="sourceLineNo">605</span>    private final Object construct(final Node node) {<a name="line.605"></a>
-<span class="sourceLineNo">606</span>      return this.yamlConstructors.get(node.getTag()).construct(node);<a name="line.606"></a>
-<span class="sourceLineNo">607</span>    }<a name="line.607"></a>
-<span class="sourceLineNo">608</span>    <a name="line.608"></a>
-<span class="sourceLineNo">609</span>  }<a name="line.609"></a>
-<span class="sourceLineNo">610</span><a name="line.610"></a>
-<span class="sourceLineNo">611</span>}<a name="line.611"></a>
+<span class="sourceLineNo">599</span>    private HackyConstructor() {<a name="line.599"></a>
+<span class="sourceLineNo">600</span>      super();<a name="line.600"></a>
+<span class="sourceLineNo">601</span>    }<a name="line.601"></a>
+<span class="sourceLineNo">602</span><a name="line.602"></a>
+<span class="sourceLineNo">603</span>    private final Object construct(final Node node) {<a name="line.603"></a>
+<span class="sourceLineNo">604</span>      return this.yamlConstructors.get(node.getTag()).construct(node);<a name="line.604"></a>
+<span class="sourceLineNo">605</span>    }<a name="line.605"></a>
+<span class="sourceLineNo">606</span>    <a name="line.606"></a>
+<span class="sourceLineNo">607</span>  }<a name="line.607"></a>
+<span class="sourceLineNo">608</span><a name="line.608"></a>
+<span class="sourceLineNo">609</span>}<a name="line.609"></a>
 
 
 
