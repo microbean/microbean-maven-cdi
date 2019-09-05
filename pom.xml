@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.microbean</groupId>
     <artifactId>microbean-pluginmanagement-pom</artifactId>
-    <version>10</version>
+    <version>11</version>
     <relativePath />
   </parent>
 
@@ -33,7 +33,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-base-specification</artifactId>
-        <version>0.4.5</version>
+        <version>0.4.8</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -41,7 +41,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-weld-se-environment</artifactId>
-        <version>0.5.3</version>
+        <version>0.6.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -53,70 +53,70 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
-        <version>3.6.0</version>
+        <version>3.6.2</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-resolver-provider</artifactId>
-        <version>3.6.0</version>
+        <version>3.6.2</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
-        <version>3.6.0</version>
+        <version>3.6.2</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings-builder</artifactId>
-        <version>3.6.0</version>
+        <version>3.6.2</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-api</artifactId>
-        <version>1.3.3</version>
+        <version>1.4.1</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-connector-basic</artifactId>
-        <version>1.3.3</version>
+        <version>1.4.1</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-transport-file</artifactId>
-        <version>1.3.3</version>
+        <version>1.4.1</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-transport-http</artifactId>
-        <version>1.3.3</version>
+        <version>1.4.1</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-util</artifactId>
-        <version>1.3.3</version>
+        <version>1.4.1</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
-        <version>1.24</version>
+        <version>1.25</version>
         <type>jar</type>
       </dependency>
 
@@ -227,7 +227,7 @@
         <plugin>
           <groupId>org.jboss.jandex</groupId>
           <artifactId>jandex-maven-plugin</artifactId>
-          <version>1.0.5</version>
+          <version>1.0.6</version>
         </plugin>
 
       </plugins>
@@ -268,7 +268,7 @@
   <properties>
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <links>http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.6.0/apidocs,https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/,http://codehaus-plexus.github.io/plexus-utils/apidocs/</links>
+    <links>http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.6.2/apidocs/</links>
     <stylesheetfile>css/stylesheet.css</stylesheetfile>
 
     <ciUrl>https://travis-ci.org/microbean/${project.artifactId}</ciUrl>

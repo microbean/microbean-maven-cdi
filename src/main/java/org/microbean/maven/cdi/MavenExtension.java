@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017-2019 microBean.
+ * Copyright © 2017-2019 microBean™.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable; // for javadoc only
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 import java.net.JarURLConnection;
 import java.net.URI;
@@ -61,23 +54,14 @@ import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.Typed;
 
-import javax.enterprise.inject.literal.InjectLiteral;
 import javax.enterprise.inject.literal.SingletonLiteral;
 
-import javax.enterprise.inject.spi.AnnotatedField;
-import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanAttributes;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessAnnotatedType;
-import javax.enterprise.inject.spi.WithAnnotations;
-
-import javax.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
-
-import javax.enterprise.util.AnnotationLiteral;
-
-import javax.inject.Inject;
-import javax.inject.Qualifier;
+import javax.enterprise.inject.spi.ProcessBeanAttributes;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.Model;
@@ -86,6 +70,7 @@ import org.apache.maven.model.building.DefaultModelBuilder;
 import org.apache.maven.model.building.DefaultModelProcessor;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProcessor;
 
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
@@ -150,9 +135,6 @@ import org.apache.maven.settings.io.DefaultSettingsWriter;
 import org.apache.maven.settings.merge.MavenSettingsMerger;
 
 import org.apache.maven.settings.validation.DefaultSettingsValidator;
-
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryListener;
@@ -250,7 +232,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A <a
- * href="http://docs.jboss.org/cdi/spec/2.0-PRD/cdi-spec.html#spi">CDI
+ * href="http://docs.jboss.org/cdi/spec/2.0/cdi-spec.html#spi">CDI
  * 2.0 portable extension</a> that exposes the <a
  * href="https://maven.apache.org/resolver/">Maven Artifact Resolver
  * components</a> as CDI beans, particularly for the purposes of
@@ -314,11 +296,17 @@ public class MavenExtension implements Extension {
    * case no action will be taken
    *
    * @see BeforeBeanDiscovery#addAnnotatedType(Class, String)
+   *
+   * @see <a
+   * href="https://github.com/apache/maven-resolver/blob/9417310df326cd4a58b0ef534e6c0e29f7b4cb47/maven-resolver-impl/src/main/java/org/eclipse/aether/impl/guice/AetherModule.java#L100-L151">Guice
+   * bindings for {@code maven-resolver-impl}</a>
+   *
+   * @see <a
+   * href="https://github.com/apache/maven-resolver/blob/9417310df326cd4a58b0ef534e6c0e29f7b4cb47/maven-resolver-impl/src/main/java/org/eclipse/aether/impl/DefaultServiceLocator.java#L186-L215">{@code
+   * DefaultSerivceLocator} bindings</a>
    */
   private final void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery event) {
     if (event != null) {
-
-      event.addQualifier(Hinted.class);
 
       //
       // Types effectively bound by DefaultServiceLocator
@@ -356,38 +344,39 @@ public class MavenExtension implements Extension {
       event.addAnnotatedType(DefaultVersionRangeResolver.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(DefaultVersionResolver.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(FatArtifactTraverser.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(SnapshotMetadataGeneratorFactory.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(VersionsMetadataGeneratorFactory.class, "maven").add(SingletonLiteral.INSTANCE);
+      event.addAnnotatedType(SnapshotMetadataGeneratorFactory.class, "maven");
+      event.addAnnotatedType(VersionsMetadataGeneratorFactory.class, "maven");
 
       //
-      // Types effectively bound by DefaultModelBuilderFactory
+      // Types effectively bound by DefaultModelBuilderFactory.  These
+      // all have @Singleton on them already.
       //
 
-      event.addAnnotatedType(DefaultDependencyManagementImporter.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultDependencyManagementInjector.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultInheritanceAssembler.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultModelBuilder.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultModelLocator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultModelNormalizer.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultModelPathTranslator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultModelProcessor.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultModelReader.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultModelUrlNormalizer.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultModelValidator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultPathTranslator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultPluginConfigurationExpander.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultPluginManagementInjector.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultProfileInjector.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultReportConfigurationExpander.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultReportingConverter.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultSuperPomProvider.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultUrlNormalizer.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(FileProfileActivator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(JdkVersionProfileActivator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(OperatingSystemProfileActivator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(PropertyProfileActivator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(StringSearchModelInterpolator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(StubLifecycleBindingsInjector.class, "maven").add(SingletonLiteral.INSTANCE);
+      event.addAnnotatedType(DefaultDependencyManagementImporter.class, "maven");
+      event.addAnnotatedType(DefaultDependencyManagementInjector.class, "maven");
+      event.addAnnotatedType(DefaultInheritanceAssembler.class, "maven");
+      event.addAnnotatedType(DefaultModelBuilder.class, "maven");
+      event.addAnnotatedType(DefaultModelLocator.class, "maven");
+      event.addAnnotatedType(DefaultModelNormalizer.class, "maven");
+      event.addAnnotatedType(DefaultModelPathTranslator.class, "maven");
+      event.addAnnotatedType(DefaultModelProcessor.class, "maven").add(Typed.Literal.of(new Class<?>[] { ModelProcessor.class }));
+      event.addAnnotatedType(DefaultModelReader.class, "maven");
+      event.addAnnotatedType(DefaultModelUrlNormalizer.class, "maven");
+      event.addAnnotatedType(DefaultModelValidator.class, "maven");
+      event.addAnnotatedType(DefaultPathTranslator.class, "maven");
+      event.addAnnotatedType(DefaultPluginConfigurationExpander.class, "maven");
+      event.addAnnotatedType(DefaultPluginManagementInjector.class, "maven");
+      event.addAnnotatedType(DefaultProfileInjector.class, "maven");
+      event.addAnnotatedType(DefaultReportConfigurationExpander.class, "maven");
+      event.addAnnotatedType(DefaultReportingConverter.class, "maven");
+      event.addAnnotatedType(DefaultSuperPomProvider.class, "maven");
+      event.addAnnotatedType(DefaultUrlNormalizer.class, "maven");
+      event.addAnnotatedType(FileProfileActivator.class, "maven");
+      event.addAnnotatedType(JdkVersionProfileActivator.class, "maven");
+      event.addAnnotatedType(OperatingSystemProfileActivator.class, "maven");
+      event.addAnnotatedType(PropertyProfileActivator.class, "maven");
+      event.addAnnotatedType(StringSearchModelInterpolator.class, "maven");
+      event.addAnnotatedType(StubLifecycleBindingsInjector.class, "maven");
 
       //
       // Types bound by me :-)
@@ -398,10 +387,10 @@ public class MavenExtension implements Extension {
       // uncomment this line.
       // event.addAnnotatedType(Producers.class, "maven");
       event.addAnnotatedType(BasicRepositoryConnectorFactory.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultSettingsBuilder.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultSettingsReader.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultSettingsValidator.class, "maven").add(SingletonLiteral.INSTANCE);
-      event.addAnnotatedType(DefaultSettingsWriter.class, "maven").add(SingletonLiteral.INSTANCE);
+      event.addAnnotatedType(DefaultSettingsBuilder.class, "maven");
+      event.addAnnotatedType(DefaultSettingsReader.class, "maven");
+      event.addAnnotatedType(DefaultSettingsValidator.class, "maven");
+      event.addAnnotatedType(DefaultSettingsWriter.class, "maven");
       event.addAnnotatedType(FileTransporterFactory.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(HttpTransporterFactory.class, "maven").add(SingletonLiteral.INSTANCE);
       event.addAnnotatedType(MavenSettingsMerger.class, "maven").add(SingletonLiteral.INSTANCE);
@@ -409,77 +398,28 @@ public class MavenExtension implements Extension {
   }
 
   /**
-   * Inspects all types with {@link Requirement} annotations and adds
-   * {@link Inject} and {@link Hinted} annotations on each {@link
-   * Requirement}-annotated field found.
+   * A hack to work around the fact that Maven's {@link
+   * FileProfileActivator} class and {@code maven-resolver-api}'s
+   * {@link FileTransporterFactory} both end up with the same CDI <a
+   * href="https://docs.jboss.org/cdi/spec/2.0/cdi-spec.html#name_resolution">EL
+   * name</a>.
    *
-   * <p>This has the net effect of turning a Plexus injection point
-   * into a CDI injection point.</p>
+   * <p>This method arbitrarily removes the {@code file} EL name from
+   * the {@link FileProfileActivator} managed bean.</p>
    *
-   * @param <X> the type being processed
+   * @param event the event in question; may be {@code null} in which
+   * case no action will be taken
    *
-   * @param event the {@link ProcessAnnotatedType} event describing
-   * the type to process; may be {@code null} in which case no action
-   * will be taken
+   * @see FileProfileActivator
    *
-   * @see Requirement
+   * @see FileTransporterFactory
    */
-  private final <X> void processPlexusRequirementAnnotatedMembers(@Observes @WithAnnotations(Requirement.class) final ProcessAnnotatedType<X> event) {
+  private final void removeBeanName(@Observes final ProcessBeanAttributes<FileProfileActivator> event) {
     if (event != null) {
-      final AnnotatedType<X> type = event.getAnnotatedType();
-      if (type != null && type.getConstructors().stream().noneMatch(c -> c.isAnnotationPresent(Inject.class))) {
-        event.configureAnnotatedType()
-          .filterFields(f -> {
-              return f != null && f.isAnnotationPresent(Requirement.class) && !f.isAnnotationPresent(Inject.class);
-            })
-          .forEach(fc -> {
-              fc.add(InjectLiteral.INSTANCE);
-              final AnnotatedField<?> f = fc.getAnnotated();
-              if (f != null && !f.isAnnotationPresent(Hinted.class)) {
-                final Requirement requirement = f.getAnnotation(Requirement.class);
-                if (requirement != null) {
-                  final String hint = requirement.hint();
-                  if (hint != null && !hint.trim().isEmpty()) {
-                    fc.add(Hinted.Literal.of(hint));
-                  }
-                }
-              }
-            });
-      }
-    }
-  }
-
-  /**
-   * Inspects all types annotated with {@link Component} to see if
-   * they have a designated {@linkplain Component#role() role}, and,
-   * if so, adds an appropriate {@link Typed} annotation to them as
-   * well as a {@link Hinted} annotation, if necessary.
-   *
-   * @param <X> the type being processed
-   *
-   * @param event the {@link ProcessAnnotatedType} event describing
-   * the type to process; may be {@code null} in which case no action
-   * will be taken
-   *
-   * @see Component
-   */
-  private final <X> void processPlexusComponentAnnotatedTypes(@Observes @WithAnnotations(Component.class) final ProcessAnnotatedType<X> event) {
-    if (event != null) {
-      final AnnotatedType<X> type = event.getAnnotatedType();
-      if (type != null && !type.isAnnotationPresent(Typed.class)) {
-        final Component component = type.getAnnotation(Component.class);
-        if (component != null) {
-          final AnnotatedTypeConfigurator<X> atc = event.configureAnnotatedType();
-          if (atc != null) {
-            final Class<?> role = component.role();
-            if (role != null && !role.equals(Object.class)) {
-              atc.add(Typed.Literal.of(new Class<?>[] { role, Object.class }));
-            }
-            final String hint = component.hint();
-            if (hint != null && !hint.isEmpty() && !type.isAnnotationPresent(Hinted.class)) {
-              atc.add(Hinted.Literal.of(hint));
-            }
-          }
+      final BeanAttributes<FileProfileActivator> beanAttributes = event.getBeanAttributes();
+      if (beanAttributes != null) {
+        if ("file".equals(beanAttributes.getName())) {
+          event.configureBeanAttributes().name(null);
         }
       }
     }
@@ -684,7 +624,7 @@ public class MavenExtension implements Extension {
 
   /**
    * A class housing several <a
-   * href="http://docs.jboss.org/cdi/spec/2.0-PRD/cdi-spec.html#producer_method">producer
+   * href="http://docs.jboss.org/cdi/spec/2.0/cdi-spec.html#producer_method">producer
    * methods</a> that produce certain <a
    * href="https://maven.apache.org/resolver/">Maven Artifact Resolver
    * components</a>.
@@ -805,7 +745,7 @@ public class MavenExtension implements Extension {
       final DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
       request.setSystemProperties(System.getProperties());
       // request.setUserProperties(userProperties); // TODO: implement this
-      
+
       final File globalSettingsFile;
       if (globalSettingsPath == null) {
         if (mavenConfPath == null) {
@@ -892,10 +832,10 @@ public class MavenExtension implements Extension {
      */
     @Produces
     @Singleton
-    private static final ProfileSelector produceProfileSelector(@Hinted("jdk-version") final ProfileActivator jdkVersionProfileActivator,
-                                                                @Hinted("os") final ProfileActivator operatingSystemProfileActivator,
-                                                                @Hinted("property") final ProfileActivator fileProfileActivator,
-                                                                @Hinted("file") final ProfileActivator propertyProfileActivator) {
+    private static final ProfileSelector produceProfileSelector(@Named("jdk-version") final ProfileActivator jdkVersionProfileActivator,
+                                                                @Named("os") final ProfileActivator operatingSystemProfileActivator,
+                                                                @Named("property") final ProfileActivator fileProfileActivator,
+                                                                @Named("file") final ProfileActivator propertyProfileActivator) {
       final DefaultProfileSelector returnValue = new DefaultProfileSelector();
       returnValue.addProfileActivator(jdkVersionProfileActivator);
       returnValue.addProfileActivator(operatingSystemProfileActivator);
@@ -1501,133 +1441,6 @@ public class MavenExtension implements Extension {
      */
     @Override
     public final void injectLifecycleBindings(final Model model, final ModelBuildingRequest modelBuildingRequest, final ModelProblemCollector modelProblemCollector) {
-
-    }
-
-  }
-
-  /**
-   * A {@link Qualifier} used to represent the {@link
-   * Requirement#hint() hint} element of the {@link Requirement}
-   * annotation.
-   *
-   * @author <a href="http://about.me/lairdnelson/"
-   * target="_parent">Laird Nelson</a>
-   *
-   * @see Requirement
-   */
-  @Documented
-  @Qualifier
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE })
-  private static @interface Hinted {
-
-
-    /*
-     * Annotation elements.
-     */
-
-
-    /**
-     * The value of the hint.
-     *
-     * @return the value of the hint
-     */
-    String value() default "";
-
-
-    /*
-     * Inner and nested classes.
-     */
-
-
-    /**
-     * An {@link AnnotationLiteral} that represents an instance of the
-     * {@link Hinted} annotation.
-     *
-     * @author <a href="http://about.me/lairdnelson/"
-     * target="_parent">Laird Nelson</a>
-     *
-     * @see Hinted
-     */
-    static final class Literal extends AnnotationLiteral<Hinted> implements Hinted {
-
-
-      /*
-       * Static fields.
-       */
-
-
-      /**
-       * The version of this class for {@linkplain Serializable
-       * serialization purposes}.
-       */
-      private static final long serialVersionUID = 1L;
-
-
-      /*
-       * Instance fields.
-       */
-
-
-      /**
-       * The hint being represented.
-       *
-       * <p>This field is never {@code null}.</p>
-       */
-      private final String value;
-
-
-      /*
-       * Constructors.
-       */
-
-
-      /**
-       * Creates a new {@link Literal}.
-       *
-       * @param value the value of the hint; may be {@code null} in
-       * which case the empty {@link String} will be used instad
-       *
-       * @see #value()
-       */
-      private Literal(final String value) {
-        super();
-        this.value = value == null ? "" : value;
-      }
-
-
-      /*
-       * Instance methods.
-       */
-
-
-      /**
-       * Returns the value of this {@link Literal}.
-       *
-       * <p>This method never returns {@code null}.</p>
-       *
-       * @return the value of this {@link Literal}; never {@code null}
-       */
-      @Override
-      public final String value() {
-        return this.value;
-      }
-
-      /**
-       * Returns a new {@link Hinted} representing the supplied {@code
-       * value}.
-       *
-       * <p>This method never returns {@code null}.</p>
-       *
-       * @param value the value to represent; may be {@code null} in
-       * which case the empty {@link String} will be used instead
-       *
-       * @return a {@link Hinted}; never {@code null}
-       */
-      private static final Hinted of(final String value) {
-        return new Literal(value);
-      }
 
     }
 
