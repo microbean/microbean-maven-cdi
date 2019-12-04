@@ -1,9 +1,9 @@
-# microBean Maven CDI
+# microBean™ Maven CDI
 
 [![Build Status](https://travis-ci.org/microbean/microbean-maven-cdi.svg?branch=master)](https://travis-ci.org/microbean/microbean-maven-cdi)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.microbean/microbean-maven-cdi/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.microbean/microbean-maven-cdi)
 
-The microBean Maven CDI project embeds the [Maven machinery responsible
+The microBean™ Maven CDI project embeds the [Maven machinery responsible
 for interacting with artifact repositories][maven-resolver] into your CDI 2.0
 environment.
 
@@ -50,7 +50,7 @@ with dependency injection in mind.  Specifically, it was written as a
 be used from within Maven proper, which, at least in recent versions,
 uses [Guice](https://github.com/google/guice/) under the covers.
 
-The microBean Maven CDI project does just enough work to re-express
+The microBean™ Maven CDI project does just enough work to re-express
 certain Maven Guice components using CDI constructs so that you may
 simply inject the parts of `maven-resolver` that you need.
 
@@ -59,7 +59,7 @@ a
 [`RepositorySystem`](https://maven.apache.org/components/resolver/maven-resolver-api/apidocs/org/eclipse/aether/RepositorySystem.html)
 and a
 [`RepositorySystemSession`](https://maven.apache.org/components/resolver/maven-resolver-api/apidocs/org/eclipse/aether/RepositorySystemSession.html).
-With microBean Maven CDI, you simply do this:
+With microBean™ Maven CDI, you simply do this:
 
     @Inject
     private RepositorySystem repositorySystem;
@@ -72,7 +72,7 @@ extension](apidocs/org/microbean/maven/cdi/MavenExtension.html) takes
 care of setting up the dozens of supporting objects for you behind the
 scenes.
 
-microBean Maven CDI also natively understands your user-level
+microBean™ Maven CDI also natively understands your user-level
 [`~/.m2/settings.xml` file](https://maven.apache.org/settings.html),
 and can use it so that you can inject the right remote repositories,
 even taking its [local

@@ -73,9 +73,10 @@ import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProcessor;
 
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
+
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
 
-import org.apache.maven.model.interpolation.StringSearchModelInterpolator;
+import org.apache.maven.model.interpolation.StringVisitorModelInterpolator;
 
 import org.apache.maven.model.io.DefaultModelReader;
 
@@ -375,7 +376,7 @@ public class MavenExtension implements Extension {
       event.addAnnotatedType(JdkVersionProfileActivator.class, "maven");
       event.addAnnotatedType(OperatingSystemProfileActivator.class, "maven");
       event.addAnnotatedType(PropertyProfileActivator.class, "maven");
-      event.addAnnotatedType(StringSearchModelInterpolator.class, "maven");
+      event.addAnnotatedType(StringVisitorModelInterpolator.class, "maven");
       event.addAnnotatedType(StubLifecycleBindingsInjector.class, "maven");
 
       //

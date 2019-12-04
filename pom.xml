@@ -8,11 +8,11 @@
   <parent>
     <groupId>org.microbean</groupId>
     <artifactId>microbean-pluginmanagement-pom</artifactId>
-    <version>11</version>
+    <version>13</version>
     <relativePath />
   </parent>
 
-  <name>microBean Maven CDI</name>
+  <name>microBean™ Maven CDI</name>
   <description>${project.name}</description>
   <url>http://microbean.github.io/${project.artifactId}</url>
 
@@ -33,7 +33,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-base-specification</artifactId>
-        <version>0.4.8</version>
+        <version>0.5.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -41,7 +41,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-weld-se-environment</artifactId>
-        <version>0.6.2</version>
+        <version>0.7.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -53,28 +53,28 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
-        <version>3.6.2</version>
+        <version>3.6.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-resolver-provider</artifactId>
-        <version>3.6.2</version>
+        <version>3.6.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
-        <version>3.6.2</version>
+        <version>3.6.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings-builder</artifactId>
-        <version>3.6.2</version>
+        <version>3.6.3</version>
         <type>jar</type>
       </dependency>
 
@@ -220,18 +220,6 @@
   </dependencies>
 
   <build>
-
-    <pluginManagement>
-      <plugins>
-
-        <plugin>
-          <groupId>org.jboss.jandex</groupId>
-          <artifactId>jandex-maven-plugin</artifactId>
-          <version>1.0.6</version>
-        </plugin>
-
-      </plugins>
-    </pluginManagement>
     <plugins>
 
       <plugin>
@@ -268,7 +256,7 @@
   <properties>
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <links>http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.6.2/apidocs/</links>
+    <links>http://docs.jboss.org/cdi/api/2.0/,http://docs.oracle.com/javaee/7/api/,https://maven.apache.org/resolver/apidocs/,https://maven.apache.org/ref/3.6.3/apidocs/</links>
     <stylesheetfile>css/stylesheet.css</stylesheetfile>
 
     <ciUrl>https://travis-ci.org/microbean/${project.artifactId}</ciUrl>
@@ -287,7 +275,6 @@
           <reportSet>
             <reports>
               <report>javadoc-no-fork</report>
-              <report>test-javadoc-no-fork</report>
             </reports>
           </reportSet>
         </reportSets>
